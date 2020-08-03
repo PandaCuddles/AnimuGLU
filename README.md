@@ -4,7 +4,7 @@ Search for and keep a local library of anime/manga details
 ## Uses Jikan REST
 * jikan_REST
    * local install : recommended
-   * online api use : change api_url in jikan_controller.py
+   * online api    : change jikan_api_url in jikan_controller.py
 
 ## Python Pip Packages
 * jikanpy

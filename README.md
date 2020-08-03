@@ -21,6 +21,6 @@ Search for and keep a local library of anime/manga details
  
  ## Images
  
- This is the current look of the UI, as of v0.5 (below is a screenshot of an example Library)
+ This is the current look of the UI, as of v0.5
  
  ![Image of AnimuGLU UI](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_0.5.png)

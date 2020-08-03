@@ -46,7 +46,7 @@ def image_all_download(animu_obj_list):
     """Download anime/manga cover images
 
     Args:
-        animu_obj_list (Anime or Manga object): List of Anime or Manga objects, see main_jikan.py
+        animu_obj_list (Anime or Manga object): List of Anime or Manga objects, see jikan_controller.py
     """
     for animu in animu_obj_list:
         dl_image(animu)
@@ -57,7 +57,7 @@ def dl_image(animu_obj):
     """Download anime/manga cover image
 
     Args:
-        animu_obj (Anime/Manga): Object containing information on a particular anime/manga, see main_jikan.py
+        animu_obj (Anime/Manga): Object containing information on a particular anime/manga, see jikan_controller.py
 
     Returns:
         None: Return only if the anime/manga cover image has been downloaded already

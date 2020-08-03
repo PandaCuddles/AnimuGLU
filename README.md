@@ -16,3 +16,11 @@ Search for and keep a local library of anime/manga details
  ## License
  Copyright © 2020 PandaCuddles
  Under the Apache license: http://www.apache.org/licenses/LICENSE-2.0
+ 
+ 
+ 
+ ## Images
+ 
+ This is the current look of the UI, as of v0.5 (below is a screenshot of an example Library)
+ 
+ ![Image of AnimuGLU UI](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_0.5.png)

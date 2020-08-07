@@ -92,9 +92,19 @@ def load_library():
 
             image, animu_obj = pickle_load(item)
             library.append((image, animu_obj))
-            name_list.append(f"{animu_obj.title} [{animu_obj.type}]")
+            if len(animu_obj.title) > 28:
+                name_list.append(f"{animu_obj.title[:27]}.. [{animu_obj.type}]")
+            else:
+                name_list.append(f"{animu_obj.title} [{animu_obj.type}]")
 
-        return name_list, library
+        # Split the tuples [(animu_img1, animu_obj1), (animu_img2, animu_obj2), etc.]
+        library_objects = []
+        library_images = []
+        for animu_tuple in library:
+            library_images.append(animu_tuple[0])
+            library_objects.append(animu_tuple[1])
+
+        return name_list, library_objects, library_images
     else:
         print("Nothing in Library")
         return None, None

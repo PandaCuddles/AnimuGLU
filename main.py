@@ -9,6 +9,7 @@ import wx
 import animu_panel
 import list_panel
 import search_panel
+import controller_panel
 
 from pubsub import pub
 
@@ -52,6 +53,8 @@ class MainPanel(wx.Panel):
 
         self.SetBackgroundColour(wx.Colour("ORANGE"))
 
+        main_controller = controller_panel.ControllerPanel(self)
+
         main_sizer = wx.BoxSizer(wx.VERTICAL)
 
         main_sizer.Add(
@@ -69,7 +72,7 @@ class AnimuFrame(wx.Frame):
         """Create the  Main Panel within the Main Frame"""
         wx.Frame.__init__(self, *args, **kwargs)
 
-        Main_panel = MainPanel(self)
+        main_panel = MainPanel(self)
 
         """Status Bar for updates"""
         self.status_bar = self.CreateStatusBar(
@@ -78,6 +81,10 @@ class AnimuFrame(wx.Frame):
         self.status_bar.SetBackgroundColour("ORANGE")
         self.status_bar.SetStatusText("  Welcome to AnimuGLU!")
         self.status_bar.SetStatusStyles([wx.SB_RAISED])
+
+        icon = wx.Icon()
+        icon.CopyFromBitmap(wx.Bitmap("icon.png", wx.BITMAP_TYPE_ANY))
+        self.SetIcon(icon)
 
         pub.subscribe(self.update_status_bar, "main_GUI-AnimuFrame")
 
@@ -96,7 +103,7 @@ if __name__ == "__main__":
     frame = AnimuFrame(
         None,
         wx.ID_ANY,
-        "AnimuGLU v0.5",
+        "AnimuGLU Alpha v0.5",
         size=(1280, 720),
         style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
     )

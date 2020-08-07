@@ -23,9 +23,9 @@ class WebpagePanel(wx.Panel):
 
         self.SetSizer(webpage_sizer)
 
-        pub.subscribe(self.current_selection_website, "webpage_panel-WebpagePanel")
+        pub.subscribe(self.set_webpage, "set_webpage")
 
-    def current_selection_website(self, animu_url):
+    def set_webpage(self, animu_url):
         self.webpage = animu_url
 
     def animu_webpage_button(self, event):

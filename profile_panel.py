@@ -92,6 +92,7 @@ class ProfileButtons(wx.Panel):
         self.SetSizer(button_box)
 
 
+# TODO: Add Import button and import functionality
 class Buttons(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         wx.Panel.__init__(self, parent, *args, **kwargs)
@@ -111,7 +112,7 @@ class Buttons(wx.Panel):
         add_button = wx.Button(self, label="Add")
 
         license_button.Bind(wx.EVT_BUTTON, self.show_license)
-        library_button.Bind(wx.EVT_BUTTON, self.show_library)
+        library_button.Bind(wx.EVT_BUTTON, self.library)
         delete_button.Bind(wx.EVT_BUTTON, self.delete_animu)
         add_button.Bind(wx.EVT_BUTTON, self.add_animu)
 
@@ -126,19 +127,11 @@ class Buttons(wx.Panel):
         dialogue = licenses_popup.LicensesPopup(self, title="Licenses", size=(250, 250))
         dialogue.Show(True)
 
-    def show_library(self, event):
-        names, animu_list = pickle_unpickle.load_library()
-
-        if names == None and animu_list == None:
-            pub.sendMessage("main_GUI-AnimuFrame", status_text="Nothing in library yet")
-            return
-        else:
-            pub.sendMessage(
-                "list_panel-Library", name_list=names, animu_tuple_list=animu_list,
-            )
+    def library(self, event):
+        pub.sendMessage("show_library")
 
     def delete_animu(self, event):
-        pub.sendMessage("list_panel-Delete")
+        pub.sendMessage("delete_selected")
 
     def add_animu(self, event):
-        pub.sendMessage("list_panel-AnimuListPanel")
+        pub.sendMessage("save_selected")

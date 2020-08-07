@@ -56,7 +56,7 @@ class SynopsisPanel(wx.Panel):
 
         self.SetSizer(synopsis_sizer)
 
-        pub.subscribe(self.display_synopsis, "info_panel-SynopsisPanel")
+        pub.subscribe(self.display_synopsis, "display_synopsis")
 
     def display_synopsis(self, synopsis):
         """Display synopsis
@@ -98,9 +98,9 @@ class DetailList(wx.ListCtrl):
 
         self.SetColumnWidth(1, -3)
 
-        pub.subscribe(self.AddItems, "info_panel-DetailList")
+        pub.subscribe(self.display_details, "display_details")
 
-    def AddItems(self, item_list):
+    def display_details(self, item_list):
         self.DeleteAllItems()
 
         for item in item_list:
@@ -196,18 +196,19 @@ class ImageDisplay(wx.Panel):
         self.SetBackgroundColour(wx.Colour("WHITE"))
 
         """If an anime/manga is clicked on in the list section"""
-        pub.subscribe(self.display_image, "image_panel-ImageDisplay")
+        pub.subscribe(self.display_cover, "display_cover")
 
         self.Bind(wx.EVT_SIZE, self.on_resize)
 
         self.image = False
 
-    def display_image(self, wx_image):
+    def display_cover(self, wx_image):
         """Resize and display cover image
 
         Args:
-            image_path (String): Path to the local image file (e.g. /<path to file>/image.jpg)
+            wx_image (wx.Image object): local image file turned into a wx.Image object
         """
+
         self.image = wx_image
 
         panel_dimensions = self.GetSize()

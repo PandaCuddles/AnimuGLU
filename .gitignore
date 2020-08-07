@@ -1,0 +1,4 @@
+images/*
+saved/*
+__pycache__
+*.log

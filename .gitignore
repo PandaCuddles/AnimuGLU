@@ -1,4 +1,2 @@
-images/*
-saved/*
-__pycache__
+__pycache__/
 *.log

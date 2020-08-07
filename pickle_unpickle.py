@@ -85,6 +85,13 @@ def load_library():
 
     """
     library_list = os.listdir(base_path)
+
+    # Github empty folder workaround solution
+    for f in library_list:
+        if f.startswith("."):
+            library_list.remove(f)
+
+    print(library_list)
     library = []
     name_list = []
     if len(library_list) > 0:

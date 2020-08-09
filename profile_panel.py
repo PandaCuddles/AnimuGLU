@@ -39,11 +39,16 @@ class InnerProfilePanel(wx.Panel):
         self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
         profile_box = wx.BoxSizer(wx.VERTICAL)
+        profile_image_sizer = wx.BoxSizer(wx.VERTICAL)
 
         profile_pic = ProfileImage(self)
         profile_buttons = ProfileButtons(self)
 
-        profile_box.Add(profile_pic, 5, wx.ALL | wx.EXPAND, 50)
+        profile_image_sizer.Add(
+            profile_pic, 1, wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND, 60
+        )
+
+        profile_box.Add(profile_image_sizer, 5, wx.BOTTOM | wx.EXPAND, 45)
         profile_box.Add(profile_buttons, 4, wx.ALL | wx.EXPAND, 20)
 
         self.SetSizer(profile_box)

@@ -21,7 +21,10 @@ class MainPanelSubTop(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("ORANGE"))
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.SetBackgroundColour(wx.Colour("DARK ORANGE"))
+        else:
+            self.SetBackgroundColour(wx.Colour("ORANGE"))
 
         """Split the top panel left/right into two sections"""
         animu_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -51,7 +54,10 @@ class MainPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("ORANGE"))
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.SetBackgroundColour(wx.Colour("DARK ORANGE"))
+        else:
+            self.SetBackgroundColour(wx.Colour("ORANGE"))
 
         main_controller = controller_panel.ControllerPanel(self)
 
@@ -78,7 +84,10 @@ class AnimuFrame(wx.Frame):
         self.status_bar = self.CreateStatusBar(
             style=wx.STB_DEFAULT_STYLE ^ wx.STB_SIZEGRIP,
         )
-        self.status_bar.SetBackgroundColour("ORANGE")
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.status_bar.SetBackgroundColour(wx.Colour("DARK ORANGE"))
+        else:
+            self.status_bar.SetBackgroundColour(wx.Colour("ORANGE"))
         self.status_bar.SetStatusText("  Welcome to AnimuGLU!")
         self.status_bar.SetStatusStyles([wx.SB_RAISED])
 

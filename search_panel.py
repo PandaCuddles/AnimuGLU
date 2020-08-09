@@ -16,9 +16,13 @@ class AnimuSearchPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("GREY"))
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+        else:
+            self.SetBackgroundColour(wx.Colour("GREY"))
 
         search_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        outer_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         search_btn = wx.Button(self, label="Search")
         search_btn.Bind(wx.EVT_BUTTON, self.search_and_send_animu)
@@ -33,12 +37,14 @@ class AnimuSearchPanel(wx.Panel):
 
         self.animu_choice.SetSelection(0)
 
-        search_sizer.Add(self.animu_choice, 0, wx.ALL | wx.CENTER, 3)
-        search_sizer.Add(search_btn, 0, wx.ALL | wx.CENTER, 3)
-        search_sizer.Add(self.text_input, 1, wx.ALL | wx.CENTER, 3)
-        search_sizer.Add(exit_btn, 0, wx.ALL | wx.CENTER, 3)
+        search_sizer.Add(self.animu_choice, 0, wx.RIGHT | wx.CENTER, 3)
+        search_sizer.Add(search_btn, 0, wx.RIGHT | wx.CENTER, 3)
+        search_sizer.Add(self.text_input, 1, wx.RIGHT | wx.CENTER, 3)
+        search_sizer.Add(exit_btn, 0, wx.CENTER)
 
-        self.SetSizer(search_sizer)
+        outer_sizer.Add(search_sizer, 1, wx.ALL | wx.EXPAND, 10)
+
+        self.SetSizer(outer_sizer)
 
     def search_and_send_animu(self, event):
         """Jikan search request

@@ -13,7 +13,10 @@ class AnimuInfoPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("GREY"))
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+        else:
+            self.SetBackgroundColour(wx.Colour("GREY"))
 
         info_panel_sizer = wx.BoxSizer(wx.VERTICAL)
         top_section_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -174,7 +177,10 @@ class ImagePanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("GREY"))
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+        else:
+            self.SetBackgroundColour(wx.Colour("GREY"))
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         button_sizer = wx.BoxSizer(wx.HORIZONTAL)

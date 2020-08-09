@@ -32,7 +32,10 @@ class CreditsPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("GREY"))
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+        else:
+            self.SetBackgroundColour(wx.Colour("GREY"))
 
         credits_sizer = wx.BoxSizer(wx.VERTICAL)
 

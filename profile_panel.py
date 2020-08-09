@@ -14,7 +14,10 @@ class ProfilePanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("GREY"))
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+        else:
+            self.SetBackgroundColour(wx.Colour("GREY"))
 
         inner_box = wx.BoxSizer(wx.VERTICAL)
         inner_panel = InnerProfilePanel(self)
@@ -52,7 +55,10 @@ class ProfileImage(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("GREY"))
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+        else:
+            self.SetBackgroundColour(wx.Colour("GREY"))
 
         self.Bind(wx.EVT_SIZE, self.on_resize)
 

@@ -12,7 +12,10 @@ class AnimuPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("ORANGE"))
+        if wx.SystemSettings.GetAppearance().IsDark():
+            self.SetBackgroundColour(wx.Colour("DARK ORANGE"))
+        else:
+            self.SetBackgroundColour(wx.Colour("ORANGE"))
 
         info_sizer = wx.BoxSizer(wx.HORIZONTAL)
         profile_box = wx.BoxSizer(wx.VERTICAL)
@@ -21,8 +24,8 @@ class AnimuPanel(wx.Panel):
         profile = profile_panel.ProfilePanel(self)
         animuGLU_credits = credits_panel.CreditsPanel(self)
 
-        profile_box.Add(profile, 4, wx.BOTTOM | wx.RIGHT | wx.EXPAND, 5)
-        profile_box.Add(animuGLU_credits, 1, wx.TOP | wx.RIGHT | wx.EXPAND, 5)
+        profile_box.Add(profile, 4, wx.BOTTOM | wx.EXPAND, 5)
+        profile_box.Add(animuGLU_credits, 1, wx.TOP | wx.EXPAND, 5)
 
         """Right side of the anime info section with the info boxes"""
         info_box = info_panel.AnimuInfoPanel(self)

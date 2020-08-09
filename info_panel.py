@@ -43,7 +43,9 @@ class SynopsisPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.WHITE)
+        # self.SetBackgroundColour(wx.WHITE)
+
+        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
         synopsis_sizer = wx.BoxSizer(wx.VERTICAL)
         synopsis_title = wx.StaticText(self, label="Synopsis:")
@@ -74,7 +76,9 @@ class DetailsPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.WHITE)
+        # self.SetBackgroundColour(wx.WHITE)
+
+        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
         detail_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -193,7 +197,9 @@ class ImageDisplay(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("WHITE"))
+        # self.SetBackgroundColour(wx.Colour("WHITE"))
+
+        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
         """If an anime/manga is clicked on in the list section"""
         pub.subscribe(self.display_cover, "display_cover")

@@ -31,7 +31,9 @@ class InnerProfilePanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("WHITE"))
+        # self.SetBackgroundColour(wx.Colour("WHITE"))
+
+        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
         profile_box = wx.BoxSizer(wx.VERTICAL)
 
@@ -99,7 +101,9 @@ class Buttons(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("WHITE"))
+        # self.SetBackgroundColour(wx.Colour("WHITE"))
+
+        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
         button_sizer = wx.BoxSizer(wx.VERTICAL)
 

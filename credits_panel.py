@@ -8,7 +8,9 @@ class CreditTextPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("WHITE"))
+        # self.SetBackgroundColour(wx.Colour("WHITE"))
+
+        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
         text_sizer = wx.BoxSizer(wx.VERTICAL)
 

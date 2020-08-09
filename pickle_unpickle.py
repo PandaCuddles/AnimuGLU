@@ -91,7 +91,6 @@ def load_library():
         if f.startswith("."):
             library_list.remove(f)
 
-    print(library_list)
     library = []
     name_list = []
     if len(library_list) > 0:
@@ -113,6 +112,5 @@ def load_library():
 
         return name_list, library_objects, library_images
     else:
-        print("Nothing in Library")
-        return None, None
+        return None, None, None
 

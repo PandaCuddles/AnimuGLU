@@ -63,13 +63,14 @@ class AnimuSearchPanel(wx.Panel):
         pub.sendMessage("show_search_results", names=name_list, animu_objects=obj_list)
 
     def exit_animu(self, event):
-        """Exit application
+        """Exit application and remove temporary images
 
         Note to self: sys.exit() just raises a SystemExit exception
         inside the current thread, it doesn't actually force the program
         closed.
 
         """
+        os.rm
         os._exit(1)
         # sys.exit()
         pass

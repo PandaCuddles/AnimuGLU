@@ -69,8 +69,11 @@ class SynopsisPanel(wx.Panel):
         Args:
             synopsis (String): Synopsis of the currently selected anime/manga
         """
-        self.synopsis_text.Clear()
-        self.synopsis_text.SetValue(synopsis)
+        if synopsis:
+            self.synopsis_text.Clear()
+            self.synopsis_text.SetValue(synopsis)
+        else:
+            self.synopsis_text.Clear()
 
 
 class DetailsPanel(wx.Panel):
@@ -108,16 +111,19 @@ class DetailList(wx.ListCtrl):
         pub.subscribe(self.display_details, "display_details")
 
     def display_details(self, item_list):
-        self.DeleteAllItems()
+        if item_list:
+            self.DeleteAllItems()
 
-        for item in item_list:
+            for item in item_list:
 
-            i = self.format_item(item)
+                i = self.format_item(item)
 
-            self.Append(i)
+                self.Append(i)
 
-        self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-        self.SetColumnWidth(1, wx.LIST_AUTOSIZE)
+            self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+            self.SetColumnWidth(1, wx.LIST_AUTOSIZE)
+        else:
+            self.DeleteAllItems()
 
     def format_item(self, item):
         # TODO: Fix the elif formatting problem, ugh
@@ -214,23 +220,32 @@ class ImageDisplay(wx.Panel):
 
         self.image = False
 
+        self.ImgCover = None
+
     def display_cover(self, wx_image):
         """Resize and display cover image
 
         Args:
             wx_image (wx.Image object): local image file turned into a wx.Image object
         """
+        if wx_image:
+            self.image = wx_image
 
-        self.image = wx_image
+            panel_dimensions = self.GetSize()
 
-        panel_dimensions = self.GetSize()
+            bitmap = wx.Bitmap(self.image)
 
-        bitmap = wx.Bitmap(self.image)
+            scaled_bitmap = self.scale_image(bitmap, panel_dimensions)
 
-        scaled_bitmap = self.scale_image(bitmap, panel_dimensions)
+            if self.ImgCover:
+                self.ImgCover.Destroy()
 
-        self.ImgCover = statbmp.GenStaticBitmap(self, wx.ID_ANY, scaled_bitmap)
-        self.ImgCover.Center()
+            self.ImgCover = statbmp.GenStaticBitmap(self, wx.ID_ANY, scaled_bitmap)
+            self.ImgCover.Center()
+
+        else:  # Reset info panel when deleting library item
+            if self.ImgCover:
+                self.ImgCover.Destroy()
 
     def on_resize(self, event):
         if self.image:

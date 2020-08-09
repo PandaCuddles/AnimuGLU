@@ -68,7 +68,8 @@ class ControllerPanel(wx.Panel):
 
         name_list, library_objects, library_images = pickle_unpickle.load_library()
 
-        if name_list == None:
+        if name_list == None or library_objects == None:
+            pub.sendMessage("populate_listbox", name_list=name_list)
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Nothing in library yet")
             return
         else:
@@ -101,6 +102,10 @@ class ControllerPanel(wx.Panel):
 
             os.remove(f"{default_path}{id_to_delete}")
             pub.sendMessage("show_library")
+            pub.sendMessage("display_synopsis", synopsis=None)
+            pub.sendMessage("display_details", item_list=None)
+            pub.sendMessage("set_webpage", animu_url=None)
+            pub.sendMessage("display_cover", wx_image=None)
 
         else:
             pub.sendMessage(

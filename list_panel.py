@@ -29,8 +29,11 @@ class AnimuListPanel(wx.Panel):
         pub.subscribe(self.populate_listbox, "populate_listbox")
 
     def populate_listbox(self, name_list):
-        self.animu_list.Clear()  # Clear listbox before populating
-        self.animu_list.InsertItems(name_list, 0)  # Insert new search results
+        if name_list:
+            self.animu_list.Clear()  # Clear listbox before populating
+            self.animu_list.InsertItems(name_list, 0)  # Insert new search results
+        else:
+            self.animu_list.Clear()
 
     # Send the current selection index over to the controller panel
     def select(self, event):

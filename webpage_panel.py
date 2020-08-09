@@ -29,11 +29,14 @@ class WebpagePanel(wx.Panel):
         pub.subscribe(self.set_webpage, "set_webpage")
 
     def set_webpage(self, animu_url):
-        self.webpage = animu_url
+        if animu_url:
+            self.webpage = animu_url
+        else:
+            self.webpage = None
 
     def animu_webpage_button(self, event):
         if self.webpage:
             webbrowser.open(self.webpage)
         else:
             # ? Possibly send "No selection" to status bar when no anime/manga selection has been made
-            print()
+            pass

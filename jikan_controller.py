@@ -39,6 +39,7 @@ class Manga:
         self.end_date = manga_dict["end_date"]
         self.members = manga_dict["members"]
         self.localImage = f"{default_image_dir}{self.mal_id}.jpg"
+        self.searchType = "Manga"
 
         self.info_list = [
             ("Id", self.mal_id),
@@ -72,6 +73,7 @@ class Anime:
         self.members = anime_dict["members"]
         self.rated = anime_dict["rated"]
         self.localImage = f"{default_image_dir}{self.mal_id}.jpg"
+        self.searchType = "Anime"
 
         self.info_list = [
             ("Id", self.mal_id),
@@ -87,8 +89,17 @@ class Anime:
         ]
 
 
-def detailed_search(animu_id):
-    details = jikan.anime(animu_id)
+def detailed_search(animu_id, istype):
+
+    if istype == "Anime":
+        details = jikan.anime(animu_id)
+    elif istype == "Manga":
+        details = jikan.manga(animu_id)
+    else:
+        print(
+            "Error occurred with detailed search while saving: check jikan_controller.py"
+        )
+        return None
 
     """
     genres = []

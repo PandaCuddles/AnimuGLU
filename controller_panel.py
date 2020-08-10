@@ -85,6 +85,9 @@ class ControllerPanel(wx.Panel):
             )
 
     def configure_save(self, save_obj, details):
+        if not details:
+            return
+
         genres = []
         for genre in details["genres"]:
             genres.append(genre["name"])
@@ -97,7 +100,9 @@ class ControllerPanel(wx.Panel):
 
         pub.sendMessage("main_GUI-AnimuFrame", status_text="Saving...")
 
-        expanded_details = jikan_controller.detailed_search(self.selected_object.mal_id)
+        expanded_details = jikan_controller.detailed_search(
+            self.selected_object.mal_id, self.selected_object.searchType
+        )
         self.configure_save(self.selected_object, expanded_details)
 
         pickle_unpickle.pickle_save(

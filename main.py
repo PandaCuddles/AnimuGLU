@@ -114,7 +114,7 @@ if __name__ == "__main__":
         wx.ID_ANY,
         "AnimuGLU Alpha v0.5",
         size=(1280, 720),
-        style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,
+        style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,  # Prevent window resizing
     )
 
     frame.Show(True)

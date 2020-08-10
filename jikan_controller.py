@@ -87,6 +87,21 @@ class Anime:
         ]
 
 
+def detailed_search(animu_id):
+    details = jikan.anime(animu_id)
+
+    """
+    genres = []
+    for genre in details["genres"]:
+        genres.append(genre["name"])
+        # print(genre["name"])
+
+    print(", ".join(genres))
+    """
+
+    return details
+
+
 def basic_search(animu_type, name, page_num=1):
     animu_obj_list = []
     animu_name_list = []

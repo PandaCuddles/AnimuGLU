@@ -112,7 +112,7 @@ if __name__ == "__main__":
     frame = AnimuFrame(
         None,
         wx.ID_ANY,
-        "AnimuGLU Alpha v0.5",
+        "AnimuGLU Alpha v0.6",
         size=(1280, 720),
         style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,  # Prevent window resizing
     )

@@ -15,9 +15,13 @@ Search for and keep a local library of anime/manga details
  
 ## Images
  
-This is the current look of the UI, as of v0.5
+Light Mode
  
-![Image of AnimuGLU UI](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_0.5.png)
+![Image of AnimuGLU Light Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_Alpha_0.6_Light)
+
+Dark Mode
+
+![Image of AnimuGLU Dark Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_Alpha_0.6_Dark)
  
 ## License
 Copyright © 2020 PandaCuddles

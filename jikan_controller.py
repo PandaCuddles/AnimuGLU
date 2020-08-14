@@ -151,9 +151,5 @@ def check_download(animu_obj):
         return False
 
 
-def all_img_dl(animu_obj_list):
-    dlsv.image_all_download(animu_obj_list)
-
-
 def single_img_dl(animu_obj):
     dlsv.dl_image(animu_obj)

@@ -42,16 +42,6 @@ def store_animu(animu_obj):
     print()
 
 
-def image_all_download(animu_obj_list):
-    """Download anime/manga cover images
-
-    Args:
-        animu_obj_list (Anime or Manga object): List of Anime or Manga objects, see jikan_controller.py
-    """
-    for animu in animu_obj_list:
-        dl_image(animu)
-
-
 # An animu_obj is anything that deals with anime or manga
 def dl_image(animu_obj):
     """Download anime/manga cover image

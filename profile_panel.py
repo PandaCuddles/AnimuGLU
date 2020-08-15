@@ -147,7 +147,7 @@ class Buttons(wx.Panel):
     #    dialogue.Show(True)
     def import_list(self, event):
         import_list = []
-        # Copied from https://wxpython.org/Phoenix/docs/html/wx.FileDialog.html
+        # Copied base code snippet from https://wxpython.org/Phoenix/docs/html/wx.FileDialog.html
         with wx.FileDialog(
             self,
             "Open import list",

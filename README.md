@@ -17,11 +17,11 @@ Search for and keep a local library of anime/manga details
  
 Light Mode
  
-![Image of AnimuGLU Light Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_Alpha_0.6_Light)
+![Image of AnimuGLU Light Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_Alpha_0.6_Light.png)
 
 Dark Mode
 
-![Image of AnimuGLU Dark Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_Alpha_0.6_Dark)
+![Image of AnimuGLU Dark Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_Alpha_0.6_Dark.png)
  
 ## License
 Copyright © 2020 PandaCuddles

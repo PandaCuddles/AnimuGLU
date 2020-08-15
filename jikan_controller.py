@@ -124,9 +124,13 @@ def basic_search(animu_type, name, page_num=1):
     )
 
     """Limited search results to 2 items (I have slow internet at the moment)"""
-    results = jikan.search(
-        animu_type.lower(), name, page=page_num, parameters={"limit": 2}
-    )
+    try:
+        results = jikan.search(
+            animu_type.lower(), name, page=page_num, parameters={"limit": 2}
+        )
+    except:
+        pub.sendMessage("main_GUI-AnimuFrame", status_text="Search failed")
+        return None, None
 
     for result in results["results"]:
 

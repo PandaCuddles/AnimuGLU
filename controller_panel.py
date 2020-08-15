@@ -80,6 +80,8 @@ class ControllerPanel(wx.Panel):
                     )
         # for item in formatted_import_list:
         #    print(item)
+        # TODO: Send list to a custom download function for info + PIL img
+        # TODO: Loop through items and send each one to the pickle function
 
     def show_library(self):
 
@@ -88,6 +90,7 @@ class ControllerPanel(wx.Panel):
         if name_list == None or library_objects == None:
             pub.sendMessage("populate_listbox", name_list=name_list)
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Nothing in library yet")
+            self.in_library = False
             return
         else:
             self.in_library = True
@@ -114,18 +117,23 @@ class ControllerPanel(wx.Panel):
 
     def save_selected(self):
 
-        pub.sendMessage("main_GUI-AnimuFrame", status_text="Saving...")
+        if not self.in_library and self.selected_object:
+            pub.sendMessage("main_GUI-AnimuFrame", status_text="Saving...")
 
-        expanded_details = jikan_controller.detailed_search(
-            self.selected_object.mal_id, self.selected_object.searchType
-        )
-        self.configure_save(self.selected_object, expanded_details)
+            expanded_details = jikan_controller.detailed_search(
+                self.selected_object.mal_id, self.selected_object.searchType
+            )
+            self.configure_save(self.selected_object, expanded_details)
 
-        pickle_unpickle.pickle_save(
-            self.selected_object, self.selected_object.localImage
-        )
+            pickle_unpickle.pickle_save(
+                self.selected_object, self.selected_object.localImage
+            )
 
-        pub.sendMessage("main_GUI-AnimuFrame", status_text="Saved!")
+            pub.sendMessage("main_GUI-AnimuFrame", status_text="Saved!")
+        else:
+            pub.sendMessage(
+                "main_GUI-AnimuFrame", status_text="No search item selected"
+            )
 
     def delete_selected(self):
         if self.in_library:

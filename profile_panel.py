@@ -152,7 +152,7 @@ class Buttons(wx.Panel):
             self,
             "Open import list",
             wildcard="text files (*.txt)|*.txt",
-            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
+            style=wx.FD_OPEN,
         ) as fileDialog:
 
             if fileDialog.ShowModal() == wx.ID_CANCEL:
@@ -164,9 +164,7 @@ class Buttons(wx.Panel):
                 with open(pathname, "r") as file:
                     file_lines = file.readlines()
                     for line in file_lines:
-                        import_list.append(
-                            line.replace("\n", "")
-                        )  # strip new line and append to import list
+                        import_list.append(line.replace("\n", ""))
             except IOError:
                 wx.LogError("Cannot open file '%s'." % newfile)
         if len(import_list) > 0:

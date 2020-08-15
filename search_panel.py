@@ -59,8 +59,10 @@ class AnimuSearchPanel(wx.Panel):
             search_name = " "
 
         name_list, obj_list = jikan_controller.basic_search(search_type, search_name)
-
-        pub.sendMessage("show_search_results", names=name_list, animu_objects=obj_list)
+        if name_list and obj_list:
+            pub.sendMessage(
+                "show_search_results", names=name_list, animu_objects=obj_list
+            )
 
     def exit_animu(self, event):
         """Exit application and remove temporary images

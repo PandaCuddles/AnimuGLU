@@ -7,10 +7,6 @@ from PIL import Image
 base_path = f"{os.getcwd()}/saved/"
 
 
-def prepare_image(image):
-    pass
-
-
 def pickle_save(data, image):
     pkl_path = f"{base_path}{str(data.mal_id)}.pkl"
 

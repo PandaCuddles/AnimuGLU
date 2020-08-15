@@ -78,6 +78,8 @@ class ControllerPanel(wx.Panel):
                     file.write(
                         f"Line {import_list.index(item)}: {item} :FAILED (Formatting Error)\n"
                     )
+        # for item in formatted_import_list:
+        #    print(item)
 
     def show_library(self):
 

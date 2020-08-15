@@ -12,6 +12,15 @@ Search for and keep a local library of anime/manga details
  
 ## How to run
 * python3 main.py
+
+## Import file structure
+General structure: "<series name> -<a | m>"
+
+example.txt
+name of series1 -a
+name of series2 -m
+name of series3 -m
+etc.
  
 ## Images
  

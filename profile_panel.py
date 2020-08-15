@@ -118,7 +118,9 @@ class Buttons(wx.Panel):
 
         button_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        license_button = wx.Button(self, label="Licenses")
+        #    license_button = wx.Button(self, label="Licenses")
+
+        import_button = wx.Button(self, label="Import")
 
         library_button = wx.Button(self, label="Library")
 
@@ -126,21 +128,49 @@ class Buttons(wx.Panel):
 
         add_button = wx.Button(self, label="Add")
 
-        license_button.Bind(wx.EVT_BUTTON, self.show_license)
+        #    license_button.Bind(wx.EVT_BUTTON, self.show_license)
+        import_button.Bind(wx.EVT_BUTTON, self.import_list)
         library_button.Bind(wx.EVT_BUTTON, self.library)
         delete_button.Bind(wx.EVT_BUTTON, self.delete_animu)
         add_button.Bind(wx.EVT_BUTTON, self.add_animu)
 
-        button_sizer.Add(license_button, 1, wx.TOP | wx.EXPAND, 5)
+        #   button_sizer.Add(license_button, 1, wx.TOP | wx.EXPAND, 5)
+        button_sizer.Add(import_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(library_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(delete_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(add_button, 1, wx.TOP | wx.EXPAND, 5)
 
         self.SetSizer(button_sizer)
 
-    def show_license(self, event):
-        dialogue = licenses_popup.LicensesPopup(self, title="Licenses", size=(250, 250))
-        dialogue.Show(True)
+    # def show_license(self, event):
+    #    dialogue = licenses_popup.LicensesPopup(self, title="Licenses", size=(250, 250))
+    #    dialogue.Show(True)
+    def import_list(self, event):
+        import_list = []
+        # Copied from https://wxpython.org/Phoenix/docs/html/wx.FileDialog.html
+        with wx.FileDialog(
+            self,
+            "Open import list",
+            wildcard="text files (*.txt)|*.txt",
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST,
+        ) as fileDialog:
+
+            if fileDialog.ShowModal() == wx.ID_CANCEL:
+                return  # the user changed their mind
+
+            # Proceed loading the file chosen by the user
+            pathname = fileDialog.GetPath()
+            try:
+                with open(pathname, "r") as file:
+                    file_lines = file.readlines()
+                    for line in file_lines:
+                        import_list.append(
+                            line.replace("\n", "")
+                        )  # strip new line and append to import list
+            except IOError:
+                wx.LogError("Cannot open file '%s'." % newfile)
+        if len(import_list) > 0:
+            pub.sendMessage("import_list", import_list=import_list)
 
     def library(self, event):
         pub.sendMessage("show_library")

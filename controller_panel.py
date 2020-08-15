@@ -35,6 +35,7 @@ class ControllerPanel(wx.Panel):
         pub.subscribe(self.delete_selected, "delete_selected")
         pub.subscribe(self.save_selected, "save_selected")
         pub.subscribe(self.view_selected, "view_selected")
+        pub.subscribe(self.import_list, "import_list")
 
     def show_search_results(self, names, animu_objects):
         """ Send results to listbox and download cover images
@@ -64,6 +65,19 @@ class ControllerPanel(wx.Panel):
 
         self.curr_thread = dl_thread.DownloadThread(search_list=search_results)
         self.curr_thread.start()
+
+    def import_list(self, import_list):
+        formatted_import_list = []
+        for item in import_list:
+            if " -a" in item:
+                formatted_import_list.append((item[0:-3], "Anime"))
+            elif " -m" in item:
+                formatted_import_list.append((item[0:-3], "Manga"))
+            else:
+                with open("error.log", "a") as file:
+                    file.write(
+                        f"Line {import_list.index(item)}: {item} :FAILED (Formatting Error)\n"
+                    )
 
     def show_library(self):
 

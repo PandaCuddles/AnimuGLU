@@ -6,6 +6,7 @@ Requires: pypubsub
 
 """
 import wx
+import dlsv
 import animu_panel
 import list_panel
 import search_panel
@@ -107,6 +108,11 @@ class AnimuFrame(wx.Frame):
 
 
 if __name__ == "__main__":
+
+    # Check for and create necessary folders if missing
+    dlsv.mk_dir("saved")
+    dlsv.mk_dir("images")
+
     app = wx.App(False)
 
     frame = AnimuFrame(

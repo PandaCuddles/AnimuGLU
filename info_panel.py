@@ -126,54 +126,67 @@ class DetailList(wx.ListCtrl):
             self.DeleteAllItems()
 
     def format_item(self, item):
-        # TODO: Fix the elif formatting problem, ugh
-        if item[0] == "Airing" and item[1] == False:
-            i = ("Airing", "No")
 
-        elif item[0] == "Start Date" and not (item[1] == None):
-            date = parser.parse(item[1])
+        formatter = {
+            "Airing": self.airing,
+            "Start Date": self.format_date,
+            "End Date": self.format_date,
+            "Publishing": self.publishing,
+            "Chapters": self.has_chpt_vol,
+            "Volumes": self.has_chpt_vol,
+            "Score": self.score,
+        }
 
-            month = date.strftime("%b")
-            day = str(date.day)
-            year = str(date.year)
-
-            date_formatted = f"{month} {day}, {year}"
-
-            i = (item[0], date_formatted)
-
-        elif item[0] == "End Date" and not (item[1] == None):
-            date = parser.parse(item[1])
-
-            month = date.strftime("%b")
-            day = str(date.day)
-            year = str(date.year)
-
-            date_formatted = f"{month} {day}, {year}"
-
-            i = (item[0], date_formatted)
-        elif item[0] == "End Date" and item[1] == None:
-            i = (item[0], "?")
-
-        elif item[0] == "Publishing" and item[1] == True:
-            i = ("Status", "Publishing")
-
-        elif item[0] == "Publishing" and item[1] == False:
-            i = ("Status", "Finished")
-
-        elif item[0] == "Chapters" and item[1] == 0:
-            i = (item[0], "Unknown")
-
-        elif item[0] == "Volumes" and item[1] == 0:
-            i = (item[0], "Unknown")
-
-        elif item[0] == "Score" and item[1] == 0:
-            i = (item[0], "None")
+        if item[0] in formatter:
+            "Sends the details into the corresponding function to be formatted"
+            formatted = formatter[item[0]](item[1])
+            return (self.name(item[0]), formatted)  # Formats name, if needed
 
         else:
-            item = (item[0], str(item[1]))
-            i = item
+            return (item[0], str(item[1]))
 
-        return i
+    def airing(self, airing):
+        if airing:
+            return str(airing)
+        else:
+            return "No"
+
+    def format_date(self, date):
+        if date:
+            parsed = parser.parse(date)
+
+            month = parsed.strftime("%b")
+            day = str(parsed.day)
+            year = str(parsed.year)
+
+            return f"{month} {day}, {year}"
+        else:
+            return "?"
+
+    def publishing(self, publishing):
+        if publishing:
+            return "Publishing"
+        else:
+            return "Finished"
+        i = ("Status", "Publishing")
+
+    def has_chpt_vol(self, chpt_vol):
+        if chpt_vol:
+            return str(chpt_vol)
+        else:
+            return "Unknown"
+
+    def score(self, score):
+        if score == 0:
+            return "None"
+        else:
+            return str(score)
+
+    def name(self, name):
+        if name == "Publishing":
+            return "Status"
+        else:
+            return name
 
 
 class ImagePanel(wx.Panel):

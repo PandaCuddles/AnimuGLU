@@ -8,19 +8,14 @@ from os import mkdir
 
 def mk_dir(dir_name):
 
-    # Checks if directory exists
-    exists = isdir(dir_name)
-
     # If directory missing, create a new one
-    if not (exists):
+    if not isdir(dir_name):
         try:
             mkdir(dir_name)
         except OSError:
             print(f"Failed create folder: {dir_name}")
         else:
             print(f"Created folder: {dir_name}")
-    else:
-        print(f"Folder already exists: {dir_name}")
 
 
 # An animu_obj is anything that deals with anime or manga
@@ -38,8 +33,7 @@ def dl_image(animu_obj):
     img_path = f"images/{str(animu_obj.mal_id)}.jpg"
 
     # Checks if the image already exists
-    pre_check = isfile(img_path)
-    if pre_check:
+    if isfile(img_path):
         print(f"Animu image already saved: {animu_obj.title}")
         return
 

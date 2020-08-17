@@ -75,10 +75,12 @@ class AnimuSearchPanel(wx.Panel):
 
         """
 
+        """
         images = [image for image in os.listdir(image_folder) if image.endswith(".jpg")]
 
         for image in images:
             os.remove(os.path.join(image_folder, image))
+        """
         os._exit(1)
         # sys.exit()
         pass

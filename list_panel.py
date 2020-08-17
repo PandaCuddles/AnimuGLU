@@ -1,10 +1,6 @@
 import wx
-import os
-import pickle_unpickle
-import dl_thread
 
 from pubsub import pub
-from os.path import isfile
 
 
 class AnimuListPanel(wx.Panel):

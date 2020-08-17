@@ -128,7 +128,8 @@ def basic_search(animu_type, name, page_num=1):
         results = jikan.search(
             animu_type.lower(), name, page=page_num, parameters={"limit": 2}
         )
-    except:
+    except Exception as e:
+        # print(e) # Development and bug testing
         pub.sendMessage("main_GUI-AnimuFrame", status_text="Search failed")
         return None, None
 

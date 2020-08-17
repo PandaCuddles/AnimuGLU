@@ -4,7 +4,7 @@ import pickle
 
 from PIL import Image
 
-base_path = f"{os.getcwd()}/saved/"
+base_path = f"saved/"
 
 
 def pickle_save(data, image):
@@ -17,6 +17,9 @@ def pickle_save(data, image):
         return "Animu already saved"
     else:
         with open(pkl_path, "wb") as file_handler:
+            """Higher the protocol, the newer the python version needed (but the best optimized with the most features and support)
+            protocol 4 supports python 3.4+ (3.8 add protocol 5)
+            """
             pickle.dump(image, file_handler, protocol=4)
             pickle.dump(data, file_handler, protocol=4)
 

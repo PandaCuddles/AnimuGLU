@@ -1,10 +1,13 @@
 import wx
-import os
 import jikan_controller
 import dl_thread
 import pickle_unpickle
 
 from pubsub import pub
+from os import remove
+from os.path import isfile
+
+base_path = "saved/"
 
 
 class ControllerPanel(wx.Panel):
@@ -104,6 +107,12 @@ class ControllerPanel(wx.Panel):
             )
 
     def configure_save(self, save_obj, details):
+        """Append formatted genre list and full synopsis to animu object
+
+        Args:
+            save_obj (animu obj): An Anime or Manga object instance
+            details (dict): jikan api search result
+        """
         if not details:
             return
 
@@ -139,10 +148,8 @@ class ControllerPanel(wx.Panel):
         if self.in_library:
 
             animu = self.current_animu_list[self.selected_index]
-            default_path = f"{os.getcwd()}/saved/"
-            id_to_delete = f"{str(animu.mal_id)}.pkl"
 
-            os.remove(f"{default_path}{id_to_delete}")
+            remove(f"{base_path}{str(animu.mal_id)}.pkl")
             pub.sendMessage("show_library")
             pub.sendMessage("display_synopsis", synopsis=None)
             pub.sendMessage("display_details", item_list=None)
@@ -162,7 +169,7 @@ class ControllerPanel(wx.Panel):
             pub.sendMessage("display_synopsis", synopsis=self.selected_object.synopsis)
             pub.sendMessage("display_details", item_list=self.selected_object.info_list)
             pub.sendMessage("set_webpage", animu_url=self.selected_object.url)
-            self.image_exists = os.path.isfile(self.selected_object.localImage)
+            self.image_exists = isfile(self.selected_object.localImage)
 
             if self.image_exists:
                 wx_image = wx.Image(self.selected_object.localImage, wx.BITMAP_TYPE_ANY)

@@ -4,6 +4,8 @@ import wx
 import jikan_controller
 from pubsub import pub
 
+image_folder = f"images/"
+
 
 class AnimuSearchPanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
@@ -72,7 +74,6 @@ class AnimuSearchPanel(wx.Panel):
         closed.
 
         """
-        image_folder = f"{os.getcwd()}/images/"
 
         images = [image for image in os.listdir(image_folder) if image.endswith(".jpg")]
 

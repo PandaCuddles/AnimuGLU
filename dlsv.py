@@ -1,45 +1,26 @@
-import os
 import requests
 import shutil
 import pickle
 
-program_dir = os.getcwd()
+from os.path import isdir, isfile
+from os import mkdir
 
 
 def mk_dir(dir_name):
 
-    dir_path = f"{program_dir}/{dir_name}"
-
     # Checks if directory exists
-    exists = os.path.isdir(dir_path)
+    exists = isdir(dir_name)
 
     # If directory missing, create a new one
     if not (exists):
         try:
-            os.mkdir(dir_path)
+            mkdir(dir_name)
         except OSError:
-            print(f"Failed create folder: {dir_path}")
+            print(f"Failed create folder: {dir_name}")
         else:
-            print(f"Created folder: {dir_path}")
+            print(f"Created folder: {dir_name}")
     else:
-        print(f"Folder already exists: {dir_path}")
-
-
-def store_animu(animu_obj):
-
-    # Saves all the animu objects in a single file called animu_db.pkl
-    animu_db = f"{program_dir}/animu_db.pkl"
-
-    print(f"Storing animu info: {animu_obj.title}")
-
-    with open(animu_db, "ab") as db_file_handler:
-        """Higher the protocol, the newer the python version needed (but the best optimized with the most features and support)
-        protocol 4 supports python 3.4+ (3.8 add protocol 5)
-        """
-        pickle.dump(animu_obj, db_file_handler, protocol=4)
-
-    # Just a spacer for the debug messages
-    print()
+        print(f"Folder already exists: {dir_name}")
 
 
 # An animu_obj is anything that deals with anime or manga
@@ -54,10 +35,10 @@ def dl_image(animu_obj):
     """
 
     # Directory for mal animu images (saved as "prg_dir/images/mal_id.jpg")
-    img_path = f"{program_dir}/images/{str(animu_obj.mal_id)}.jpg"
+    img_path = f"images/{str(animu_obj.mal_id)}.jpg"
 
     # Checks if the image already exists
-    pre_check = os.path.isfile(img_path)
+    pre_check = isfile(img_path)
     if pre_check:
         print(f"Animu image already saved: {animu_obj.title}")
         return

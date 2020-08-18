@@ -168,7 +168,6 @@ class DetailList(wx.ListCtrl):
             return "Publishing"
         else:
             return "Finished"
-        i = ("Status", "Publishing")
 
     def has_chpt_vol(self, chpt_vol):
         if chpt_vol:

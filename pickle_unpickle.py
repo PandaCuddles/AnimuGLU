@@ -4,22 +4,22 @@ import pickle
 
 from PIL import Image
 
-base_path = f"saved/"
+library_path = f"saved/"
 
 
 def pickle_save(data, image):
-    pkl_path = f"{base_path}{str(data.mal_id)}.pkl"
+    """Pickle animu data after converting animu image file to PIL Image"""
+    pkl_path = f"{library_path}{str(data.mal_id)}.pkl"
 
-    # Create PIL image object (wx objects can't be pickled)
     image = Image.open(image)
 
     if os.path.isfile(pkl_path):
         return "Animu already saved"
     else:
         with open(pkl_path, "wb") as file_handler:
-            """Higher the protocol, the newer the python version needed (but the best optimized with the most features and support)
-            protocol 4 supports python 3.4+ (3.8 add protocol 5)
-            """
+            # Higher the protocol, the newer the python version needed (but the best optimized with the most features and support)
+            # protocol 4 supports python 3.4+ (3.8 add protocol 5)
+
             pickle.dump(image, file_handler, protocol=4)
             pickle.dump(data, file_handler, protocol=4)
 
@@ -27,7 +27,7 @@ def pickle_save(data, image):
 
 
 def convert_pil_img_to_wx_img(unpickled_pil_img):
-    # Python Image Library Image object converted into a wx Image object
+    """Python Image Library Image object converted into a wx Image object"""
     pil_width = unpickled_pil_img.size[0]
     pil_height = unpickled_pil_img.size[1]
     wx_image = wx.Image(pil_width, pil_height)
@@ -46,7 +46,7 @@ def pickle_load(file_id):
     Args:
         id (str): filename of the anime/manga used to initially pickle the anime/manga
     """
-    pkl_path = f"{base_path}{file_id}"
+    pkl_path = f"{library_path}{file_id}"
     with open(pkl_path, "rb") as file_handler:
         image = pickle.load(file_handler)
 
@@ -69,40 +69,45 @@ def load_library():
     [
         name1,
         name2,
-        etc..
-    ]
+        etc...
+    ],
 
     [
-        (wx_image1, animu_object1),
-        (wx_image2, animu_object2),
-        etc.
+        animu_object1,
+        animu_object2,
+        etc...
+    ],
+
+    [
+        PIL_image1,
+        PIL_image2,
+        etc...
     ]
 
-    name -> see main_jikan.py -> Anime/Manga self.title
-    wx_image -> see PILConverterWxImg function above
-    animu_object -> see main_jikan.py
+    name -> see jikan_controller.py -> Anime/Manga self.title
+    wx_image -> see convert_pil_img_to_wx_img function above
+    animu_object -> see jikan_controller.py
 
     """
-    library_list = os.listdir(base_path)
-
-    # Github empty folder workaround solution
-    for f in library_list:
-        if f.startswith("."):
-            library_list.remove(f)
+    library_list = os.listdir(library_path)
 
     library = []
     name_list = []
+
+    # If library not empty, load library
     if len(library_list) > 0:
         for item in library_list:
 
             image, animu_obj = pickle_load(item)
             library.append((image, animu_obj))
+
+            # Shorten long titles and format for display
             if len(animu_obj.title) > 28:
                 name_list.append(f"{animu_obj.title[:27]}.. [{animu_obj.type}]")
             else:
                 name_list.append(f"{animu_obj.title} [{animu_obj.type}]")
 
-        # Split the tuples [(animu_img1, animu_obj1), (animu_img2, animu_obj2), etc.]
+        # Separate image/object pair [(animu_img1, animu_obj1), (animu_img2, animu_obj2), etc.]
         library_objects = []
         library_images = []
         for animu_tuple in library:
@@ -111,5 +116,6 @@ def load_library():
 
         return name_list, library_objects, library_images
     else:
+        # Used to check if library is empty
         return None, None, None
 

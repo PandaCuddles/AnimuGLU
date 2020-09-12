@@ -42,11 +42,10 @@ class AnimuInfoPanel(wx.Panel):
 
 class SynopsisPanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
+        """Create the Synopsys Panel"""
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
-
-        # self.SetBackgroundColour(wx.WHITE)
 
         self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
@@ -78,17 +77,16 @@ class SynopsisPanel(wx.Panel):
 
 class DetailsPanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
+        """Create the Details Panel"""
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
-
-        # self.SetBackgroundColour(wx.WHITE)
 
         self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
         detail_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        """List control object"""
+        # List control object
         self.detailList = DetailList(
             self, wx.ID_ANY, style=wx.LC_REPORT | wx.LC_HRULES,
         )
@@ -99,6 +97,7 @@ class DetailsPanel(wx.Panel):
 
 class DetailList(wx.ListCtrl):
     def __init__(self, parent, *args, **kwargs):
+        """Create the Detail List Panel"""
         wx.ListCtrl.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
@@ -111,6 +110,14 @@ class DetailList(wx.ListCtrl):
         pub.subscribe(self.display_details, "display_details")
 
     def display_details(self, item_list):
+        """Display anime/manga information, (e.g. name, rating, start/end date)
+
+        Args:
+            item_list (list): contains list of tuples, each an anime/manga detail (e.g. (Name, SomeName))
+        """
+
+        # wx List Control boxes can take in tuples as input
+        # and autofill each column with the tuple contents
         if item_list:
             self.DeleteAllItems()
 
@@ -119,13 +126,21 @@ class DetailList(wx.ListCtrl):
                 i = self.format_item(item)
 
                 self.Append(i)
-
+            # Resize columns to fit largest string in each column
             self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
             self.SetColumnWidth(1, wx.LIST_AUTOSIZE)
         else:
             self.DeleteAllItems()
 
     def format_item(self, item):
+        """format anime/manga details (e.g. Airing date into human readable format)
+
+        Args:
+            item (tuple): detail name and detail info
+
+        Returns:
+            tuple: formatted detail name and detail info converted to string
+        """
 
         formatter = {
             "Airing": self.airing,
@@ -138,7 +153,7 @@ class DetailList(wx.ListCtrl):
         }
 
         if item[0] in formatter:
-            "Sends the details into the corresponding function to be formatted"
+            # Sends the details into the corresponding function to be formatted
             formatted = formatter[item[0]](item[1])
             return (self.name(item[0]), formatted)  # Formats name, if needed
 
@@ -146,12 +161,14 @@ class DetailList(wx.ListCtrl):
             return (item[0], str(item[1]))
 
     def airing(self, airing):
+        """Returns Airing value as a string, unless None, which will return 'No', as formatted on MAL"""
         if airing:
             return str(airing)
         else:
             return "No"
 
     def format_date(self, date):
+        """Turns date string into a human readable format"""
         if date:
             parsed = parser.parse(date)
 
@@ -164,24 +181,29 @@ class DetailList(wx.ListCtrl):
             return "?"
 
     def publishing(self, publishing):
+        """Converts publishing value from a boolean into a correctly formatted name, as formatted on MAL"""
         if publishing:
             return "Publishing"
         else:
             return "Finished"
 
     def has_chpt_vol(self, chpt_vol):
+        """Returns Chapter Volume as a string, unless None, which will return 'Unknown', as formatted on MAL"""
         if chpt_vol:
             return str(chpt_vol)
         else:
             return "Unknown"
 
     def score(self, score):
+        """Score of 0 returns string 'None', as displayed on MAL (otherwise returns score as a string)"""
         if score == 0:
             return "None"
         else:
             return str(score)
 
     def name(self, name):
+        """Formats Publishing status name, since jikan API returns 'Publishing' as the detail name,
+           rather than 'Status' (MAL displays detail as 'Status')"""
         if name == "Publishing":
             return "Status"
         else:

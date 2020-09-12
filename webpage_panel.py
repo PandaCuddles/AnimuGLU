@@ -5,7 +5,7 @@ from pubsub import pub
 
 class WebpagePanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
-        """Create the Add Animu Panel"""
+        """Create the Webpage Panel"""
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
@@ -29,12 +29,14 @@ class WebpagePanel(wx.Panel):
         pub.subscribe(self.set_webpage, "set_webpage")
 
     def set_webpage(self, animu_url):
+        """Set url for webpage button (opens url in browser on button press)"""
         if animu_url:
             self.webpage = animu_url
         else:
             self.webpage = None
 
     def animu_webpage_button(self, event):
+        """If webpage url set for button, open in web browser"""
         if self.webpage:
             webbrowser.open(self.webpage)
         else:

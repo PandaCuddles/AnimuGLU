@@ -67,20 +67,15 @@ class AnimuSearchPanel(wx.Panel):
             )
 
     def exit_animu(self, event):
-        """Exit application and remove temporary images
+        """Exit application"""
 
-        Note to self: sys.exit() just raises a SystemExit exception
-        inside the current thread, it doesn't actually force the program
-        closed.
+        # Note: sys.exit() just raises a SystemExit exception
+        # inside the current thread, it doesn't actually force the program
+        # closed.
 
-        """
-
-        """
-        images = [image for image in os.listdir(image_folder) if image.endswith(".jpg")]
-
-        for image in images:
-            os.remove(os.path.join(image_folder, image))
-        """
-        os._exit(1)
+        # images = [image for image in os.listdir(image_folder) if image.endswith(".jpg")]
+        # for image in images:
+        #    os.remove(os.path.join(image_folder, image))
         # sys.exit()
-        pass
+
+        os._exit(1)

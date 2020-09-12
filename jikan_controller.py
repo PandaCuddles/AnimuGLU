@@ -4,8 +4,11 @@ from jikanpy import Jikan
 from pubsub import pub
 
 
-# Change url depending on if a local setup is used or not
+# Default local api url if using a local setup
 jikan_api_url = "http://localhost:8080/v3"
+
+# Default online api if not using local setup (has restrictions)
+# jikan_api_url = "https://api.jikan.moe/v3"
 
 jikan = Jikan(selected_base=jikan_api_url)
 
@@ -14,7 +17,7 @@ jikan = Jikan(selected_base=jikan_api_url)
 prg_directory = os.getcwd()
 default_image_dir = f"{prg_directory}/images/"
 
-""" Animu Object
+""" Animu object
 
 A python object representing either a single manga or a single anime.
 
@@ -23,6 +26,7 @@ A python object representing either a single manga or a single anime.
 
 class Manga:
     def __init__(self, manga_dict):
+        """Create Manga object from Jikan search results, formatted from json->dict"""
         self.manga = manga_dict["title"]
 
         self.mal_id = manga_dict["mal_id"]
@@ -57,6 +61,7 @@ class Manga:
 
 class Anime:
     def __init__(self, anime_dict):
+        """Create Anime (animation) object from Jikan search results, formatted from json->dict"""
         self.anime = anime_dict["title"]
 
         self.mal_id = anime_dict["mal_id"]
@@ -90,6 +95,15 @@ class Anime:
 
 
 def detailed_search(animu_id, istype):
+    """Search for specific MAL id
+
+    Args:
+        animu_id (int): MAL id
+        istype (string): either 'Anime' or 'Manga', specifying Jikan search method
+
+    Returns:
+        dict: dictionary created from json formatted search results
+    """
 
     if istype == "Anime":
         details = jikan.anime(animu_id)
@@ -101,38 +115,31 @@ def detailed_search(animu_id, istype):
         )
         return None
 
-    """
-    genres = []
-    for genre in details["genres"]:
-        genres.append(genre["name"])
-        # print(genre["name"])
-
-    print(", ".join(genres))
-    """
-
     return details
 
 
 def basic_search(animu_type, name, page_num=1):
+
     animu_obj_list = []
+    # name list corresponds to index of object list
     animu_name_list = []
 
-    """Loading message for user"""
+    # Loading message for user
     pub.sendMessage(
         "main_GUI-AnimuFrame",
-        status_text="  Loading... (this may take a while, depending on your internet connection)",
+        status_text="  Loading... (may take a while if internet is slow)",
     )
 
-    """Limited search results to 2 items (I have slow internet at the moment)"""
+    # Search limit: 2 (Increase if on fast internet)
     try:
         results = jikan.search(
             animu_type.lower(), name, page=page_num, parameters={"limit": 2}
         )
     except Exception as e:
-        # print(e) # Development and bug testing
         pub.sendMessage("main_GUI-AnimuFrame", status_text="Search failed")
         return None, None
 
+    # Create Anime/Manga objects based on search results
     for result in results["results"]:
 
         if animu_type == "Anime":
@@ -143,12 +150,13 @@ def basic_search(animu_type, name, page_num=1):
         animu_obj_list.append(animu_obj)
         animu_name_list.append(animu_obj.title)
 
-    # Return animu names and the animu objects associated with each name
+    # Return list of animu objects and list of associated names
     pub.sendMessage("main_GUI-AnimuFrame", status_text="  Done")
     return animu_name_list, animu_obj_list
 
 
 def check_download(animu_obj):
+    """Checks if a specific anime/manga cover image was downloaded"""
     check = os.path.isfile(f"{default_image_dir}/{animu_obj.mal_id}.jpg")
     if check:
         return True
@@ -157,4 +165,5 @@ def check_download(animu_obj):
 
 
 def single_img_dl(animu_obj):
+    """Download specific anime/manga cover image"""
     dlsv.dl_image(animu_obj)

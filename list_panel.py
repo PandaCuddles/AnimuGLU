@@ -14,7 +14,6 @@ class AnimuListPanel(wx.Panel):
 
         list_sizer = wx.BoxSizer()
 
-        """Search results display box"""
         self.animu_list = wx.ListBox(self, style=wx.LB_SINGLE | wx.LB_NEEDED_SB)
         self.animu_list.Bind(wx.EVT_LISTBOX, self.select)
 
@@ -25,14 +24,15 @@ class AnimuListPanel(wx.Panel):
         pub.subscribe(self.populate_listbox, "populate_listbox")
 
     def populate_listbox(self, name_list):
+        """Clear list box if empty, or clear listbox and repopulate if not empty"""
         if name_list:
-            self.animu_list.Clear()  # Clear listbox before populating
-            self.animu_list.InsertItems(name_list, 0)  # Insert new search results
+            self.animu_list.Clear()
+            self.animu_list.InsertItems(name_list, 0)
         else:
             self.animu_list.Clear()
 
-    # Send the current selection index over to the controller panel
     def select(self, event):
+        """Send the current selection index over to the controller panel"""
         selection = self.animu_list.GetSelection()
 
         pub.sendMessage("view_selected", selected_index=selection)

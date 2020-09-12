@@ -92,6 +92,7 @@ class ProfileImage(wx.Panel):
 
 class ProfileButtons(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
+        """Format panel for profile panel buttons"""
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
@@ -108,17 +109,14 @@ class ProfileButtons(wx.Panel):
 # TODO: Add Import button and import functionality
 class Buttons(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
+        """Buttons panel for profile panel that contains main app buttons"""
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
 
-        # self.SetBackgroundColour(wx.Colour("WHITE"))
-
         self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
 
         button_sizer = wx.BoxSizer(wx.VERTICAL)
-
-        #    license_button = wx.Button(self, label="Licenses")
 
         import_button = wx.Button(self, label="Import")
 
@@ -128,13 +126,11 @@ class Buttons(wx.Panel):
 
         add_button = wx.Button(self, label="Add")
 
-        #    license_button.Bind(wx.EVT_BUTTON, self.show_license)
         import_button.Bind(wx.EVT_BUTTON, self.import_list)
         library_button.Bind(wx.EVT_BUTTON, self.library)
         delete_button.Bind(wx.EVT_BUTTON, self.delete_animu)
         add_button.Bind(wx.EVT_BUTTON, self.add_animu)
 
-        #   button_sizer.Add(license_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(import_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(library_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(delete_button, 1, wx.TOP | wx.EXPAND, 5)
@@ -142,10 +138,12 @@ class Buttons(wx.Panel):
 
         self.SetSizer(button_sizer)
 
-    # def show_license(self, event):
-    #    dialogue = licenses_popup.LicensesPopup(self, title="Licenses", size=(250, 250))
-    #    dialogue.Show(True)
     def import_list(self, event):
+        # TODO: Add import file text formatting examples to docstring
+        """Check import file for item names and content types to add to library
+            <put import file formatting examples here>
+
+        """
         import_list = []
         # Copied base code snippet from https://wxpython.org/Phoenix/docs/html/wx.FileDialog.html
         with wx.FileDialog(
@@ -170,11 +168,16 @@ class Buttons(wx.Panel):
         if len(import_list) > 0:
             pub.sendMessage("import_list", import_list=import_list)
 
+    # TODO: Finish import logic
+
     def library(self, event):
+        """Send message to conroller panel to display library contents"""
         pub.sendMessage("show_library")
 
     def delete_animu(self, event):
+        """Send message to controller panel to delete selected item in library"""
         pub.sendMessage("delete_selected")
 
     def add_animu(self, event):
+        """Send message to controller panel to save selected item in search results"""
         pub.sendMessage("save_selected")

@@ -7,8 +7,7 @@ from os import mkdir
 
 
 def mk_dir(dir_name):
-
-    # If directory missing, create a new one
+    """Create directory for library and cover image downloads if missing"""
     if not isdir(dir_name):
         try:
             mkdir(dir_name)
@@ -18,12 +17,11 @@ def mk_dir(dir_name):
             print(f"Created folder: {dir_name}")
 
 
-# An animu_obj is anything that deals with anime or manga
 def dl_image(animu_obj):
     """Download anime/manga cover image
 
     Args:
-        animu_obj (Anime/Manga): Object containing information on a particular anime/manga, see jikan_controller.py
+        animu_obj (Anime/Manga object): Object containing information on a particular anime/manga, see jikan_controller.py
 
     Returns:
         None: Return only if the anime/manga cover image has been downloaded already

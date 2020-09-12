@@ -9,9 +9,9 @@ from os.path import isfile
 
 base_path = "saved/"
 
-
+# TODO: Redo Controller Panel docstring
 class ControllerPanel(wx.Panel):
-    """Required to be a wx object for pubsub memory space to be the same"""
+    """Controller Panel containing key program logic, and acts as a 'main hub' for different parts of the program"""
 
     def __init__(self, parent, *args, **kwargs):
 
@@ -43,8 +43,10 @@ class ControllerPanel(wx.Panel):
     def show_search_results(self, names, animu_objects):
         """ Send results to listbox and download cover images
 
-        animu_objects : [obj1, obj2, obj3]
-        names : ["name1", "name2", "name3"]
+        Args:
+            animu_objects : [obj1, obj2, obj3]
+
+            names : ["name1", "name2", "name3"]
 
         """
         self.in_library = False
@@ -125,13 +127,15 @@ class ControllerPanel(wx.Panel):
         save_obj.synopsis = details["synopsis"]
 
     def save_selected(self):
-
+        """Check if program is in search mode, and if so, save selected anime/manga"""
         if not self.in_library and self.selected_object:
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Saving...")
 
+            # Retrieve more detailed info on selected item
             expanded_details = jikan_controller.detailed_search(
                 self.selected_object.mal_id, self.selected_object.searchType
             )
+            # Add extra details to animu object before pickling
             self.configure_save(self.selected_object, expanded_details)
 
             pickle_unpickle.pickle_save(

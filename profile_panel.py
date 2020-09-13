@@ -1,7 +1,6 @@
 import wx
 import pickle_unpickle
 import webpage_panel
-import licenses_popup
 
 from pubsub import pub
 from wx.lib import statbmp

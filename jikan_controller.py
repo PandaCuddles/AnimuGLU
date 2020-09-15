@@ -126,8 +126,7 @@ def basic_search(animu_type, name, page_num=1):
 
     # Loading message for user
     pub.sendMessage(
-        "main_GUI-AnimuFrame",
-        status_text="  Loading... (may take a while if internet is slow)",
+        "main_GUI-AnimuFrame", status_text="  Loading... (may take a while)",
     )
 
     # Search limit: 2 (Increase if on fast internet)
@@ -136,6 +135,7 @@ def basic_search(animu_type, name, page_num=1):
             animu_type.lower(), name, page=page_num, parameters={"limit": 2}
         )
     except Exception as e:
+        print(e)
         pub.sendMessage("main_GUI-AnimuFrame", status_text="Search failed")
         return None, None
 

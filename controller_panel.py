@@ -1,13 +1,12 @@
-import wx
+import dlsv
 import jikan_controller
-import dl_thread
 import pickle_unpickle
+import wx
 
-from pubsub import pub
 from os import remove
-from os.path import isfile
+from pubsub import pub
 
-base_path = "saved/"
+library_path = "saved/"
 
 # TODO: Redo Controller Panel docstring
 class ControllerPanel(wx.Panel):
@@ -60,9 +59,16 @@ class ControllerPanel(wx.Panel):
                         f"Line {import_list.index(item)}: {item} :FAILED (Formatting Error)\n"
                     )
 
-        print(formatted_import_list)
-        # TODO: Send list to a custom download function for info + PIL img
-        # TODO: Loop through items and send each one to the pickle function
+        for item in formatted_import_list:
+            name = item[0]
+            kind = item[1]
+            names, objs = jikan_controller.basic_search(kind, name)
+            if objs:
+                self.selected_object = objs[0]
+                self.save_selected()
+        pub.sendMessage(
+            "main_GUI-AnimuFrame", status_text="Finished Importing",
+        )
 
     def show_library(self):
 
@@ -126,7 +132,7 @@ class ControllerPanel(wx.Panel):
 
             animu = self.current_animu_list[self.selected_index]
 
-            remove(f"{base_path}{str(animu.mal_id)}.pkl")
+            remove(f"{library_path}{str(animu.mal_id)}.pkl")
             pub.sendMessage("show_library")
             pub.sendMessage("display_synopsis", synopsis=None)
             pub.sendMessage("display_details", item_list=None)

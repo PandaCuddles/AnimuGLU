@@ -1,9 +1,6 @@
-import pickle
-import requests
-import shutil
-
-from os.path import isdir, isfile
+from os.path import isdir
 from os import mkdir
+from os import remove
 from PIL import Image
 from urllib import error, request
 
@@ -29,6 +26,8 @@ def dl_img(animu_obj):
     try:
         url = request.urlretrieve(animu_obj.image_url, temp)
         img = Image.open(temp)
+        # Data corruption occurs if temp image file not deleted before next image download
+        remove(temp)
         return img
     except error.HTTPError as e:
         e_msg = f"Could not download {animu_obj.title}: {e}"

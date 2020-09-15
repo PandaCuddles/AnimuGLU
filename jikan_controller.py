@@ -5,10 +5,10 @@ from pubsub import pub
 
 
 # Default local api url if using a local setup
-jikan_api_url = "http://localhost:8080/v3"
+# jikan_api_url = "http://localhost:8080/v3"
 
 # Default online api if not using local setup (has restrictions)
-# jikan_api_url = "https://api.jikan.moe/v3"
+jikan_api_url = "https://api.jikan.moe/v3"
 
 jikan = Jikan(selected_base=jikan_api_url)
 
@@ -42,7 +42,7 @@ class Manga:
         self.start_date = manga_dict["start_date"]
         self.end_date = manga_dict["end_date"]
         self.members = manga_dict["members"]
-        self.localImage = f"{default_image_dir}{self.mal_id}.jpg"
+        self.image = None
         self.searchType = "Manga"
 
         self.info_list = [
@@ -77,7 +77,7 @@ class Anime:
         self.end_date = anime_dict["end_date"]
         self.members = anime_dict["members"]
         self.rated = anime_dict["rated"]
-        self.localImage = f"{default_image_dir}{self.mal_id}.jpg"
+        self.image = None
         self.searchType = "Anime"
 
         self.info_list = [
@@ -142,10 +142,13 @@ def basic_search(animu_type, name, page_num=1):
     # Create Anime/Manga objects based on search results
     for result in results["results"]:
 
+        # Create object from anime/manga and download and store cover image inside the object
         if animu_type == "Anime":
             animu_obj = Anime(result)
+            animu_obj.image = dlsv.dl_img(animu_obj)
         if animu_type == "Manga":
             animu_obj = Manga(result)
+            animu_obj.image = dlsv.dl_img(animu_obj)
 
         animu_obj_list.append(animu_obj)
         animu_name_list.append(animu_obj.title)

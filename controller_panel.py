@@ -21,14 +21,8 @@ class ControllerPanel(wx.Panel):
         self.soup = "get out of the soup isle"
 
         self.current_animu_list = None
-        self.library_image_list = None
-        self.curr_thread = False
 
         self.in_library = False
-
-        self.image_list = None
-        self.image_path = None
-        self.image_exists = None
 
         self.selected_object = None
         self.selected_index = None
@@ -52,24 +46,6 @@ class ControllerPanel(wx.Panel):
         self.in_library = False
         self.current_animu_list = animu_objects
         pub.sendMessage("populate_listbox", name_list=names)
-        self.download_cover_images(animu_objects)
-
-    def download_cover_images(self, search_results):
-        """Download cover images from list of search results
-
-        Args:
-            search_results (list): list of animu objects
-
-            e.g. [animu_obj1, animu_obj2, animu_obj3, etc.]
-
-        """
-
-        if self.curr_thread and self.curr_thread.is_alive:
-            self.curr_thread.KILL = True
-            self.curr_thread.join()
-
-        self.curr_thread = dl_thread.DownloadThread(search_list=search_results)
-        self.curr_thread.start()
 
     def import_list(self, import_list):
         formatted_import_list = []
@@ -83,14 +59,14 @@ class ControllerPanel(wx.Panel):
                     file.write(
                         f"Line {import_list.index(item)}: {item} :FAILED (Formatting Error)\n"
                     )
-        # for item in formatted_import_list:
-        #    print(item)
+
+        print(formatted_import_list)
         # TODO: Send list to a custom download function for info + PIL img
         # TODO: Loop through items and send each one to the pickle function
 
     def show_library(self):
 
-        name_list, library_objects, library_images = pickle_unpickle.load_library()
+        name_list, library_objects = pickle_unpickle.load_library()
 
         if name_list == None or library_objects == None:
             pub.sendMessage("populate_listbox", name_list=name_list)
@@ -100,7 +76,6 @@ class ControllerPanel(wx.Panel):
         else:
             self.in_library = True
 
-            self.library_image_list = library_images
             self.current_animu_list = library_objects
 
             pub.sendMessage("populate_listbox", name_list=name_list)
@@ -138,9 +113,7 @@ class ControllerPanel(wx.Panel):
             # Add extra details to animu object before pickling
             self.configure_save(self.selected_object, expanded_details)
 
-            pickle_unpickle.pickle_save(
-                self.selected_object, self.selected_object.localImage
-            )
+            pickle_unpickle.pickle_save(self.selected_object)
 
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Saved!")
         else:
@@ -173,19 +146,19 @@ class ControllerPanel(wx.Panel):
             pub.sendMessage("display_synopsis", synopsis=self.selected_object.synopsis)
             pub.sendMessage("display_details", item_list=self.selected_object.info_list)
             pub.sendMessage("set_webpage", animu_url=self.selected_object.url)
-            self.image_exists = isfile(self.selected_object.localImage)
-
-            if self.image_exists:
-                wx_image = wx.Image(self.selected_object.localImage, wx.BITMAP_TYPE_ANY)
-                pub.sendMessage("display_cover", wx_image=wx_image)
+            wx_img = pickle_unpickle.convert_pil_img_to_wx_img(
+                self.selected_object.image
+            )
+            pub.sendMessage("display_cover", wx_image=wx_img)
 
         elif self.in_library:
             pub.sendMessage("display_synopsis", synopsis=self.selected_object.synopsis)
             pub.sendMessage("display_details", item_list=self.selected_object.info_list)
             pub.sendMessage("set_webpage", animu_url=self.selected_object.url)
-            pub.sendMessage(
-                "display_cover", wx_image=self.library_image_list[selected_index]
+            wx_img = pickle_unpickle.convert_pil_img_to_wx_img(
+                self.selected_object.image
             )
+            pub.sendMessage("display_cover", wx_image=wx_img)
         else:
             print("Ya dead, son")
 

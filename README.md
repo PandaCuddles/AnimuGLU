@@ -3,20 +3,22 @@ Search for and keep a local library of anime/manga details
 
 ## Uses Jikan REST
 * jikan_REST
-   * local install : recommended
-   * online api    : change jikan_api_url in jikan_controller.py
+   * local_install (recommended)
+   * online_api (change api variable in jikan_controller.py)
 
-## Python Pip Packages
-* jikanpy
-* pypubsub
- 
+## Python3 Pip Packages
+* Pypubsub >= 4.0.30
+* jikanpy >= 4.2.2
+* wxpython >= 4.1.0
+* python-dateutil >= 2.8.1
+
 ## How to run
 * python3 main.py
 
 ## Images
- 
+
 Light Mode
- 
+
 ![Image of AnimuGLU Light Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/AnimuGLU_Alpha_0.6_Light.png)
 
 Dark Mode

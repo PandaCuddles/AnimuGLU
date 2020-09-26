@@ -1,9 +1,10 @@
-import wx
+import theme  # From theme.py
 import webpage_panel
+import wx
 
-from wx.lib import statbmp
-from pubsub import pub
 from dateutil import parser
+from pubsub import pub
+from wx.lib import statbmp
 
 
 class AnimuInfoPanel(wx.Panel):
@@ -14,9 +15,9 @@ class AnimuInfoPanel(wx.Panel):
         self.parent = parent
 
         if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+            self.SetBackgroundColour(theme.background2_dark)
         else:
-            self.SetBackgroundColour(wx.Colour("GREY"))
+            self.SetBackgroundColour(theme.background2)
 
         info_panel_sizer = wx.BoxSizer(wx.VERTICAL)
         top_section_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -47,7 +48,7 @@ class SynopsisPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
+        self.SetBackgroundColour(theme.background3_dark)
 
         synopsis_sizer = wx.BoxSizer(wx.VERTICAL)
         synopsis_title = wx.StaticText(self, label="Synopsis:")
@@ -63,6 +64,9 @@ class SynopsisPanel(wx.Panel):
         pub.subscribe(self.display_synopsis, "display_synopsis")
 
     def display_synopsis(self, synopsis):
+        # Development print
+        # print(self.synopsis_text.BackgroundColour)
+
         """Display synopsis
 
         Args:
@@ -82,7 +86,7 @@ class DetailsPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
+        self.SetBackgroundColour(theme.background3_dark)
 
         detail_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -218,9 +222,9 @@ class ImagePanel(wx.Panel):
         self.parent = parent
 
         if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+            self.SetBackgroundColour(theme.background2_dark)
         else:
-            self.SetBackgroundColour(wx.Colour("GREY"))
+            self.SetBackgroundColour(theme.background2)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
         button_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -243,14 +247,12 @@ class ImageDisplay(wx.Panel):
 
         self.parent = parent
 
-        # self.SetBackgroundColour(wx.Colour("WHITE"))
-
-        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
+        self.SetBackgroundColour(theme.background3_dark)
 
         """If an anime/manga is clicked on in the list section"""
         pub.subscribe(self.display_cover, "display_cover")
 
-        self.Bind(wx.EVT_SIZE, self.on_resize)
+        # self.Bind(wx.EVT_SIZE, self.on_resize)
 
         self.image = False
 

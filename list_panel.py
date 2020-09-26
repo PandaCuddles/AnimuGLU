@@ -1,3 +1,4 @@
+import theme  # From theme.py
 import wx
 
 from pubsub import pub
@@ -10,7 +11,7 @@ class AnimuListPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.Colour("GREY"))
+        self.SetBackgroundColour(theme.background2)
 
         list_sizer = wx.BoxSizer()
 

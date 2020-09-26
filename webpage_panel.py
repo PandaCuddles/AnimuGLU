@@ -1,3 +1,4 @@
+import theme  # From theme.py
 import wx
 import webbrowser
 from pubsub import pub
@@ -11,9 +12,9 @@ class WebpagePanel(wx.Panel):
         self.parent = parent
 
         if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+            self.SetBackgroundColour(theme.background2_dark)
         else:
-            self.SetBackgroundColour(wx.Colour("GREY"))
+            self.SetBackgroundColour(theme.background2)
 
         webpage_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -40,5 +41,6 @@ class WebpagePanel(wx.Panel):
         if self.webpage:
             webbrowser.open(self.webpage)
         else:
-            # ? Possibly send "No selection" to status bar when no anime/manga selection has been made
-            pass
+            pub.sendMessage(
+                "main_GUI-AnimuFrame", status_text="No anime/manga selected",
+            )

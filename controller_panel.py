@@ -75,10 +75,11 @@ class ControllerPanel(wx.Panel):
         name_list, library_objects = pickle_unpickle.load_library()
 
         if name_list == None or library_objects == None:
+            # Clears the listbox by sending empty list
             pub.sendMessage("populate_listbox", name_list=name_list)
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Nothing in library yet")
             self.in_library = False
-            return
+            return None
         else:
             self.in_library = True
 
@@ -128,7 +129,7 @@ class ControllerPanel(wx.Panel):
             )
 
     def delete_selected(self):
-        if self.in_library:
+        if self.in_library and self.selected_index:
 
             animu = self.current_animu_list[self.selected_index]
 
@@ -166,5 +167,5 @@ class ControllerPanel(wx.Panel):
             )
             pub.sendMessage("display_cover", wx_image=wx_img)
         else:
-            print("Ya dead, son")
+            print("Error!: Something went wrong in controller_panel.py")
 

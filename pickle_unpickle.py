@@ -1,18 +1,18 @@
-import wx
 import os
 import pickle
+import wx
 
 from PIL import Image
 
-library_path = f"saved/"
+library_path = f"library/"
 
 
 def pickle_save(data):
-    """Pickle animu data after converting animu image file to PIL Image"""
+    """Pickle anime/manga object"""
     pkl_path = f"{library_path}{str(data.mal_id)}.pkl"
 
     if os.path.isfile(pkl_path):
-        return "Animu already saved"
+        return "Already saved"
     else:
         with open(pkl_path, "wb") as file_handler:
             # Higher the protocol, the newer the python version needed (but the best optimized with the most features and support)
@@ -20,7 +20,7 @@ def pickle_save(data):
 
             pickle.dump(data, file_handler, protocol=4)
 
-            return "Animu saved"
+            return "Saved!"
 
 
 def convert_pil_img_to_wx_img(unpickled_pil_img):
@@ -86,7 +86,7 @@ def load_library():
 
             # Shorten long titles and format for display
             if len(animu_obj.title) > 28:
-                name_list.append(f"{animu_obj.title[:27]}.. [{animu_obj.type}]")
+                name_list.append(f"{animu_obj.title[:28]}.. [{animu_obj.type}]")
             else:
                 name_list.append(f"{animu_obj.title} [{animu_obj.type}]")
 

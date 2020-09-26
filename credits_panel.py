@@ -1,3 +1,4 @@
+import theme  # From theme.py
 import wx
 
 
@@ -8,7 +9,7 @@ class CreditTextPanel(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
+        self.SetBackgroundColour(theme.background3_dark)
 
         text_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -31,9 +32,9 @@ class CreditsPanel(wx.Panel):
         self.parent = parent
 
         if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+            self.SetBackgroundColour(theme.background2_dark)
         else:
-            self.SetBackgroundColour(wx.Colour("GREY"))
+            self.SetBackgroundColour(theme.background2)
 
         credits_sizer = wx.BoxSizer(wx.VERTICAL)
 

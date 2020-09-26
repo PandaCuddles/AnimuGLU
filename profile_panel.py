@@ -1,6 +1,7 @@
-import wx
 import pickle_unpickle
+import theme  # From theme.py
 import webpage_panel
+import wx
 
 from pubsub import pub
 from wx.lib import statbmp
@@ -8,15 +9,15 @@ from wx.lib import statbmp
 
 class ProfilePanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
-        """Create the Animu Text Info Panel"""
+        """Create the Profile Panel"""
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
 
         if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+            self.SetBackgroundColour(theme.background2_dark)
         else:
-            self.SetBackgroundColour(wx.Colour("GREY"))
+            self.SetBackgroundColour(theme.background2)
 
         inner_box = wx.BoxSizer(wx.VERTICAL)
         inner_panel = InnerProfilePanel(self)
@@ -28,14 +29,12 @@ class ProfilePanel(wx.Panel):
 
 class InnerProfilePanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
-        """Create the Animu Text Info Panel"""
+        """Create the Inner Profile Panel"""
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
 
-        # self.SetBackgroundColour(wx.Colour("WHITE"))
-
-        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
+        self.SetBackgroundColour(theme.background3_dark)
 
         profile_box = wx.BoxSizer(wx.VERTICAL)
         profile_image_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -55,21 +54,23 @@ class InnerProfilePanel(wx.Panel):
 
 class ProfileImage(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
+        """Create Profile Image Panel"""
         wx.Panel.__init__(self, parent, *args, **kwargs)
 
         self.parent = parent
 
         if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(wx.SystemSettings.GetColour(19))
+            self.SetBackgroundColour(theme.background2_dark)
         else:
-            self.SetBackgroundColour(wx.Colour("GREY"))
+            self.SetBackgroundColour(theme.background2)
 
-        self.Bind(wx.EVT_SIZE, self.on_resize)
+        # Set profile image after GUI has been initally drawn
+        wx.CallLater(0, self.on_resize)
 
-    def on_resize(self, event):
+    def on_resize(self):
         bitmap = wx.Bitmap("default.png")
 
-        dimensions = event.GetSize()
+        dimensions = self.GetSize()
 
         bitmap = self.scale_image(bitmap, dimensions)
 
@@ -105,7 +106,6 @@ class ProfileButtons(wx.Panel):
         self.SetSizer(button_box)
 
 
-# TODO: Add Import button and import functionality
 class Buttons(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         """Buttons panel for profile panel that contains main app buttons"""
@@ -113,7 +113,7 @@ class Buttons(wx.Panel):
 
         self.parent = parent
 
-        self.SetBackgroundColour(wx.SystemSettings.GetColour(4))
+        self.SetBackgroundColour(theme.background3_dark)
 
         button_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -144,7 +144,7 @@ class Buttons(wx.Panel):
 
         """
         import_list = []
-        # Copied base code snippet from https://wxpython.org/Phoenix/docs/html/wx.FileDialog.html
+        # Base code snippet from here: https://wxpython.org/Phoenix/docs/html/wx.FileDialog.html
         with wx.FileDialog(
             self,
             "Open import list",
@@ -163,11 +163,9 @@ class Buttons(wx.Panel):
                     for line in file_lines:
                         import_list.append(line.replace("\n", ""))
             except IOError:
-                wx.LogError("Cannot open file '%s'." % newfile)
+                wx.LogError("Cannot open file '%s'." % pathname)
         if len(import_list) > 0:
             pub.sendMessage("import_list", import_list=import_list)
-
-    # TODO: Finish import logic
 
     def library(self, event):
         """Send message to conroller panel to display library contents"""

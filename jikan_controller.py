@@ -1,5 +1,6 @@
-import os
 import dlsv
+import os
+
 from jikanpy import Jikan
 from pubsub import pub
 

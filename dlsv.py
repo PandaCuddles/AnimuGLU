@@ -1,15 +1,8 @@
-from os.path import isdir
 from os import mkdir
 from os import remove
+from os.path import isdir
 from PIL import Image
 from urllib import error, request
-
-
-def dl_imports(title_list):
-    # """Search for and save each anime/manga in import text file"""
-    for title in title_list:
-        name = title[0]
-        kind = title[1]
 
 
 def dl_img(animu_obj):

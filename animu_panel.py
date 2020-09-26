@@ -1,8 +1,7 @@
-import wx
-
 import credits_panel
 import info_panel
 import profile_panel
+import wx
 
 
 class AnimuPanel(wx.Panel):
@@ -12,10 +11,9 @@ class AnimuPanel(wx.Panel):
 
         self.parent = parent
 
-        if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(wx.Colour("DARK ORANGE"))
-        else:
-            self.SetBackgroundColour(wx.Colour("ORANGE"))
+        # Only works for platforms that support transparency
+        if self.CanSetTransparent:
+            self.SetTransparent(100)
 
         info_sizer = wx.BoxSizer(wx.HORIZONTAL)
         profile_box = wx.BoxSizer(wx.VERTICAL)

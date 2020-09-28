@@ -35,8 +35,8 @@ class MainPanel(wx.Panel):
         search_sizer = wx.BoxSizer(wx.HORIZONTAL)
         search_sizer.Add(search_panel.AnimuSearchPanel(self), 1, wx.EXPAND)
 
-        main_sizer.Add(animu_sizer, 9, wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND, 10)
         main_sizer.Add(search_sizer, 0, wx.ALL | wx.EXPAND, 10)
+        main_sizer.Add(animu_sizer, 9, wx.BOTTOM | wx.LEFT | wx.RIGHT | wx.EXPAND, 10)
 
         self.SetSizer(main_sizer)
 

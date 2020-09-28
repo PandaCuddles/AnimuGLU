@@ -168,4 +168,3 @@ class ControllerPanel(wx.Panel):
             pub.sendMessage("display_cover", wx_image=wx_img)
         else:
             print("Error!: Something went wrong in controller_panel.py")
-

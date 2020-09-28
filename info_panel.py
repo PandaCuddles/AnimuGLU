@@ -302,4 +302,3 @@ class ImageDisplay(wx.Panel):
         new_bitmap = wx.Bitmap(img)
 
         return new_bitmap
-

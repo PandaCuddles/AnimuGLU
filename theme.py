@@ -7,4 +7,3 @@ background2_dark = (145, 145, 144, 255)
 
 # background3 = ()
 background3_dark = (45, 45, 45, 255)
-

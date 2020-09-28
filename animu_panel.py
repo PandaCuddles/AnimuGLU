@@ -30,4 +30,3 @@ class AnimuPanel(wx.Panel):
         info_sizer.Add(profile_box, 1, wx.LEFT | wx.EXPAND, 10)
 
         self.SetSizer(info_sizer)
-

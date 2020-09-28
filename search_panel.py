@@ -19,10 +19,10 @@ class AnimuSearchPanel(wx.Panel):
 
         self.parent = parent
 
-        if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(theme.background2_dark)
-        else:
-            self.SetBackgroundColour(theme.background2)
+        # if wx.SystemSettings.GetAppearance().IsDark():
+        #    self.SetBackgroundColour(theme.background2_dark)
+        # else:
+        #    self.SetBackgroundColour(theme.background2)
 
         search_sizer = wx.BoxSizer(wx.HORIZONTAL)
         outer_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -30,8 +30,8 @@ class AnimuSearchPanel(wx.Panel):
         search_btn = wx.Button(self, label="Search")
         search_btn.Bind(wx.EVT_BUTTON, self.search_and_send_animu)
 
-        exit_btn = wx.Button(self, label="Exit")
-        exit_btn.Bind(wx.EVT_BUTTON, self.exit_animu)
+        # exit_btn = wx.Button(self, label="Exit")
+        # exit_btn.Bind(wx.EVT_BUTTON, self.exit_animu)
 
         self.text_input = wx.TextCtrl(self)
 
@@ -40,15 +40,14 @@ class AnimuSearchPanel(wx.Panel):
 
         self.animu_choice.SetSelection(0)
 
-        # Add selection box for Anime/Manga searches
-        search_sizer.Add(self.animu_choice, 0, wx.RIGHT | wx.CENTER, 3)
-        search_sizer.Add(search_btn, 0, wx.RIGHT | wx.CENTER, 3)
-
         # Add input text box for Anime/Manga name and button to exit the program
         search_sizer.Add(self.text_input, 1, wx.RIGHT | wx.CENTER, 3)
-        search_sizer.Add(exit_btn, 0, wx.CENTER)
 
-        outer_sizer.Add(search_sizer, 1, wx.ALL | wx.EXPAND, 10)
+        # Add selection box for Anime/Manga searches
+        search_sizer.Add(search_btn, 0, wx.LEFT | wx.CENTER, 3)
+        search_sizer.Add(self.animu_choice, 0, wx.LEFT | wx.CENTER, 3)
+
+        outer_sizer.Add(search_sizer, 1, wx.ALL | wx.EXPAND)
 
         self.SetSizer(outer_sizer)
 

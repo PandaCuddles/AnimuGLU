@@ -94,4 +94,3 @@ def load_library():
     else:
         # Used to check if library is empty
         return None, None
-

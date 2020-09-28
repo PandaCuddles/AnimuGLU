@@ -37,4 +37,3 @@ class AnimuListPanel(wx.Panel):
         selection = self.animu_list.GetSelection()
 
         pub.sendMessage("view_selected", selected_index=selection)
-

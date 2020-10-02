@@ -4,6 +4,7 @@ import animu_panel
 import controller_panel
 import dlsv
 import list_panel
+import os
 import search_panel
 import wx
 
@@ -46,6 +47,16 @@ class AnimuFrame(wx.Frame):
 
     def __init__(self, *args, **kwargs):
         """Create the  Main Panel within the Main Frame"""
+
+        # Exit app if another app was started already
+        self.name = f"AnimuGLU-{wx.GetUserId()}"
+        self.instance = wx.SingleInstanceChecker(self.name)
+
+        # Keeps only one instance of the app running at a time
+        if self.instance.IsAnotherRunning():
+            wx.MessageBox("App is already running", "ERROR")
+            os._exit(0)
+
         wx.Frame.__init__(self, *args, **kwargs)
 
         main_panel = MainPanel(self)
@@ -74,6 +85,10 @@ class AnimuFrame(wx.Frame):
         icon.CopyFromBitmap(wx.Bitmap("icon.png", wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
 
+        # Setup sort value if available
+        if os.path.isfile("config.pkl"):
+            pub.sendMessage("set_sort")
+
         pub.subscribe(self.update_status_bar, "main_GUI-AnimuFrame")
 
     def update_status_bar(self, status_text):
@@ -89,13 +104,16 @@ if __name__ == "__main__":
 
     # Check for and create necessary folders if missing
     dlsv.mk_dir("library")
+    dlsv.mk_dir("library/finished")
+    dlsv.mk_dir("library/unfinished")
+    dlsv.mk_dir("library/wishlist")
 
     app = wx.App(False)
 
     frame = AnimuFrame(
         None,
         wx.ID_ANY,
-        "AnimuGLU Alpha v0.6.7",
+        "AnimuGLU Alpha v0.7",
         size=(1280, 720),
         # style=wx.DEFAULT_FRAME_STYLE,
         style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER,  # Prevent window resizing

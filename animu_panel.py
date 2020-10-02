@@ -1,4 +1,3 @@
-import credits_panel
 import info_panel
 import profile_panel
 import wx
@@ -19,10 +18,8 @@ class AnimuPanel(wx.Panel):
         profile_box = wx.BoxSizer(wx.VERTICAL)
 
         profile = profile_panel.ProfilePanel(self)
-        animuGLU_credits = credits_panel.CreditsPanel(self)
 
-        profile_box.Add(profile, 4, wx.BOTTOM | wx.EXPAND, 5)
-        profile_box.Add(animuGLU_credits, 1, wx.TOP | wx.EXPAND, 5)
+        profile_box.Add(profile, 1, wx.EXPAND)
 
         info_box = info_panel.AnimuInfoPanel(self)
 

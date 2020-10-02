@@ -1,4 +1,5 @@
 import pickle_unpickle
+import sys
 import theme  # From theme.py
 import webpage_panel
 import wx
@@ -39,6 +40,8 @@ class InnerProfilePanel(wx.Panel):
         profile_box = wx.BoxSizer(wx.VERTICAL)
         profile_image_sizer = wx.BoxSizer(wx.VERTICAL)
 
+        profile_button_format = wx.BoxSizer(wx.VERTICAL)
+
         profile_pic = ProfileImage(self)
         profile_buttons = ProfileButtons(self)
 
@@ -46,8 +49,15 @@ class InnerProfilePanel(wx.Panel):
             profile_pic, 1, wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND, 60
         )
 
-        profile_box.Add(profile_image_sizer, 5, wx.BOTTOM | wx.EXPAND, 45)
-        profile_box.Add(profile_buttons, 4, wx.ALL | wx.EXPAND, 20)
+        profile_box.Add(profile_image_sizer, 4, wx.BOTTOM | wx.EXPAND, 60)
+
+        # Formats top, and sides of button box
+        profile_button_format.Add(
+            profile_buttons, 1, wx.TOP | wx.LEFT | wx.RIGHT | wx.EXPAND, 20
+        )
+        # Formats bottom of button box
+        profile_box.Add(profile_button_format, 5, wx.BOTTOM | wx.EXPAND, 30)
+        # profile_box.Add(profile_buttons, 4, wx.ALL | wx.EXPAND, 20)
 
         self.SetSizer(profile_box)
 
@@ -125,22 +135,26 @@ class Buttons(wx.Panel):
 
         add_button = wx.Button(self, label="Add")
 
+        exit_button = wx.Button(self, label="Exit")
+
         import_button.Bind(wx.EVT_BUTTON, self.import_list)
         library_button.Bind(wx.EVT_BUTTON, self.library)
         delete_button.Bind(wx.EVT_BUTTON, self.delete_animu)
         add_button.Bind(wx.EVT_BUTTON, self.add_animu)
+        exit_button.Bind(wx.EVT_BUTTON, self.exit)
 
         button_sizer.Add(import_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(library_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(delete_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(add_button, 1, wx.TOP | wx.EXPAND, 5)
+        button_sizer.Add(exit_button, 1, wx.TOP | wx.EXPAND, 5)
 
         self.SetSizer(button_sizer)
 
     def import_list(self, event):
         # TODO: Add import file text formatting examples to docstring
         """Check import file for item names and content types to add to library
-            <put import file formatting examples here>
+        <put import file formatting examples here>
 
         """
         import_list = []
@@ -178,3 +192,9 @@ class Buttons(wx.Panel):
     def add_animu(self, event):
         """Send message to controller panel to save selected item in search results"""
         pub.sendMessage("save_selected")
+
+    def exit(self, event):
+        """Exit application"""
+        pub.sendMessage("save_sort")
+        pub.sendMessage("save_lib_type")
+        sys.exit(0)

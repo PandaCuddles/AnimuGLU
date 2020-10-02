@@ -40,12 +40,12 @@ class AnimuSearchPanel(wx.Panel):
 
         self.animu_choice.SetSelection(0)
 
+        # Add selection box for Anime/Manga searches
+        search_sizer.Add(search_btn, 0, wx.RIGHT | wx.CENTER, 3)
+        search_sizer.Add(self.animu_choice, 0, wx.RIGHT | wx.CENTER, 3)
+
         # Add input text box for Anime/Manga name and button to exit the program
         search_sizer.Add(self.text_input, 1, wx.RIGHT | wx.CENTER, 3)
-
-        # Add selection box for Anime/Manga searches
-        search_sizer.Add(search_btn, 0, wx.LEFT | wx.CENTER, 3)
-        search_sizer.Add(self.animu_choice, 0, wx.LEFT | wx.CENTER, 3)
 
         outer_sizer.Add(search_sizer, 1, wx.ALL | wx.EXPAND)
 

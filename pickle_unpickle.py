@@ -7,9 +7,9 @@ from PIL import Image
 library_path = f"library/"
 
 
-def pickle_save(data):
+def pickle_save(data, lib_type):
     """Pickle anime/manga object"""
-    pkl_path = f"{library_path}{str(data.mal_id)}.pkl"
+    pkl_path = f"{library_path}{lib_type}/{str(data.mal_id)}.pkl"
 
     if os.path.isfile(pkl_path):
         return "Already saved"
@@ -37,13 +37,13 @@ def convert_pil_img_to_wx_img(unpickled_pil_img):
     return wx_image
 
 
-def pickle_load(file_id):
+def pickle_load(file_id, lib_type):
     """load the pickled data of a specific anime/manga
 
     Args:
         id (str): filename of the anime/manga used to initially pickle the anime/manga
     """
-    pkl_path = f"{library_path}{file_id}"
+    pkl_path = f"{library_path}{lib_type}/{file_id}"
     with open(pkl_path, "rb") as file_handler:
         data = pickle.load(file_handler)
         return data
@@ -51,7 +51,7 @@ def pickle_load(file_id):
     print("Error in loading data")
 
 
-def load_library():
+def load_library(lib_type):
     """Returns a list of anime/manga names and a list with the corresponding saved anime/manga objects
 
     Returns:
@@ -72,7 +72,10 @@ def load_library():
     ]
 
     """
-    library_list = os.listdir(library_path)
+    if os.path.isdir(f"{library_path}{lib_type}/"):
+        library_list = os.listdir(f"{library_path}{lib_type}/")
+    else:
+        return None, None
 
     library = []
     name_list = []
@@ -81,7 +84,7 @@ def load_library():
     if len(library_list) > 0:
         for item in library_list:
 
-            animu_obj = pickle_load(item)
+            animu_obj = pickle_load(item, lib_type)
             library.append(animu_obj)
 
             # Shorten long titles and format for display

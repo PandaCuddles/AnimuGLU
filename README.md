@@ -15,12 +15,6 @@ Search for and keep a local library of anime/manga details
 ## How to run
 * python3 main.py
 
-## Images
+## Example
 
-Light Mode
-
-![Image of AnimuGLU Light Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/examples/light.png)
-
-Dark Mode
-
-![Image of AnimuGLU Dark Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/examples/dark.png)
+![Image of AnimuGLU Light Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/examples/UI_Example)

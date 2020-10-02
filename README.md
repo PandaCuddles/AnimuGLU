@@ -17,4 +17,4 @@ Search for and keep a local library of anime/manga details
 
 ## Example
 
-![Image of AnimuGLU Light Theme](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/examples/UI_Example)
+![AnimuGLU Example](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/examples/UI_Example.png)

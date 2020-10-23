@@ -21,3 +21,6 @@ Search for and keep a local library of anime/manga details
 
 ## To Do
 * Rework backend to use SQLite3, instead of python pickling, for saving anime/manga info
+* Update import functionality to work with the new multi-library format
+* Add import format example to README.md
+

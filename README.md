@@ -18,3 +18,6 @@ Search for and keep a local library of anime/manga details
 ## Example
 
 ![AnimuGLU Example](https://raw.githubusercontent.com/PandaCuddles/AnimuGLU/master/examples/UI_Example.png)
+
+## To Do
+* Rework backend to use SQLite3, instead of python pickling, for saving anime/manga info

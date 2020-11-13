@@ -29,7 +29,7 @@ def dl_img(animu_obj):
 
 
 def mk_dir(dir_name):
-    """Create directory for library and cover image downloads if missing"""
+    """Creates a directory if it doesn't exist"""
     if not isdir(dir_name):
         try:
             mkdir(dir_name)

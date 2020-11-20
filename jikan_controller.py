@@ -1,7 +1,9 @@
 import dlsv
 import os
 
+
 from jikanpy import Jikan
+from dateutil import parser
 from pubsub import pub
 
 
@@ -16,7 +18,6 @@ jikan = Jikan(selected_base=jikan_api_url)
 
 # Base program directory
 prg_directory = os.getcwd()
-default_image_dir = f"{prg_directory}/images/"
 
 """ Animu object
 
@@ -46,10 +47,13 @@ class Manga:
         self.image = None
         self.searchType = "Manga"
 
+        # Format the manga details before creating the information list
+        self.format()
+
         self.info_list = [
             ("Id", self.mal_id),
             ("Title", self.title),
-            ("Publishing", self.publishing),
+            ("Status", self.publishing),
             ("Type", self.type),
             ("Chapters", self.chapters),
             ("Volumes", self.volumes),
@@ -57,7 +61,46 @@ class Manga:
             ("Start Date", self.start_date),
             ("End Date", self.end_date),
             ("Members", self.members),
-        ]
+        ] 
+    
+    def format(self):
+        # Publishing
+        if self.publishing:
+            self.publishing = "Publishing"
+        else:
+            self.publishing = "Finished"
+        
+        # Chapters
+        if self.chapters:
+            self.chapters = str(self.chapters)
+        else:
+            self.chapters = "Unknown"
+        
+        # Volumes
+        if self.volumes:
+            self.volumes = str(self.volumes)
+        else:
+            self.volumes = "Unknown"
+        
+        # Score
+        if self.score == 0:
+            self.score = "None"
+        else:
+            self.score = str(self.score)
+
+        # Start Date
+        if self.start_date:
+            par = parser.parse(self.start_date)
+            self.start_date = f"{par.strftime('%b')} {str(par.day)}, {str(par.year)}"
+        else:
+            self.start_date = "?"
+
+        # End Date
+        if self.end_date:
+            par = parser.parse(self.end_date)
+            self.end_date = f"{par.strftime('%b')} {par.day}, {par.year}"
+        else:
+            self.end_date = "?"
 
 
 class Anime:
@@ -81,6 +124,9 @@ class Anime:
         self.image = None
         self.searchType = "Anime"
 
+        # Format the anime details before creating the information list
+        self.format()
+
         self.info_list = [
             ("Id", self.mal_id),
             ("Title", self.title),
@@ -93,6 +139,39 @@ class Anime:
             ("Members", self.members),
             ("Rated", self.rated),
         ]
+
+    def format(self):
+        # Airing
+        if self.airing:
+            self.airing = "True"
+        else:
+            self.airing = "No"
+
+        # Episodes
+        if self.episodes:
+            self.episodes = str(self.episodes)
+        else:
+            self.episodes = "Unknown"
+
+        # Score
+        if self.score == 0:
+            self.score = "None"
+        else:
+            self.score = str(self.score)
+
+        # Start Date
+        if self.start_date:
+            par = parser.parse(self.start_date)
+            self.start_date = f"{par.strftime('%b')} {par.day}, {par.year}"
+        else:
+            self.start_date = "?"
+
+        # End Date
+        if self.end_date:
+            par = parser.parse(self.end_date)
+            self.end_date = f"{par.strftime('%b')} {par.day}, {par.year}"
+        else:
+            self.end_date = "?"
 
 
 def detailed_search(animu_id, istype):
@@ -157,17 +236,3 @@ def basic_search(animu_type, name, page_num=1):
     # Return list of animu objects and list of associated names
     pub.sendMessage("main_GUI-AnimuFrame", status_text="  Done")
     return animu_name_list, animu_obj_list
-
-
-def check_download(animu_obj):
-    """Checks if a specific anime/manga cover image was downloaded"""
-    check = os.path.isfile(f"{default_image_dir}/{animu_obj.mal_id}.jpg")
-    if check:
-        return True
-    else:
-        return False
-
-
-def single_img_dl(animu_obj):
-    """Download specific anime/manga cover image"""
-    dlsv.dl_image(animu_obj)

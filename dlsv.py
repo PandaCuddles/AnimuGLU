@@ -1,7 +1,9 @@
+from io import BytesIO
 from PIL import Image
 from os.path import isdir
-from urllib import (error, request)
 from os import (mkdir, remove)
+
+import requests
 
 
 def dl_img(animu_obj):
@@ -14,14 +16,12 @@ def dl_img(animu_obj):
         PIL Image: Cover image converted into a PIL image object
     """
 
-    temp = "temp.jpg"
     try:
-        request.urlretrieve(animu_obj.image_url, temp)
-        img = Image.open(temp)
-        # Data corruption occurs if temp image file not deleted before next image download
-        remove(temp)
+        response = requests.get(animu_obj.image_url)
+        img = Image.open(BytesIO(response.content)) # Treats content like a file but purely in memory
         return img
-    except error.HTTPError as e:
+
+    except requests.ConnectionError as e:
         e_msg = f"Could not download {animu_obj.title}: {e}"
         print(e_msg)
         return

@@ -1,8 +1,7 @@
-from os import mkdir
-from os import remove
-from os.path import isdir
 from PIL import Image
-from urllib import error, request
+from os.path import isdir
+from urllib import (error, request)
+from os import (mkdir, remove)
 
 
 def dl_img(animu_obj):
@@ -17,7 +16,7 @@ def dl_img(animu_obj):
 
     temp = "temp.jpg"
     try:
-        url = request.urlretrieve(animu_obj.image_url, temp)
+        request.urlretrieve(animu_obj.image_url, temp)
         img = Image.open(temp)
         # Data corruption occurs if temp image file not deleted before next image download
         remove(temp)

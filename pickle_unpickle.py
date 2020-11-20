@@ -7,6 +7,16 @@ from PIL import Image
 library_path = f"library/"
 
 
+def pil_to_wx(img):
+    """Convert PIL Image into a wx Image"""
+    width = img.size[0]
+    height = img.size[1]
+    wx_image = wx.Image(width, height)
+
+    wx_image.SetData(img.convert("RGB").tobytes())
+
+    return wx_image
+
 def pickle_save(data, lib_type):
     """Pickle anime/manga object"""
     pkl_path = f"{library_path}{lib_type}/{str(data.mal_id)}.pkl"
@@ -21,21 +31,6 @@ def pickle_save(data, lib_type):
             pickle.dump(data, file_handler, protocol=4)
 
             return "Saved!"
-
-
-def convert_pil_img_to_wx_img(unpickled_pil_img):
-    """Python Image Library Image object converted into a wx Image object"""
-    pil_width = unpickled_pil_img.size[0]
-    pil_height = unpickled_pil_img.size[1]
-    wx_image = wx.Image(pil_width, pil_height)
-
-    pil_image = unpickled_pil_img.convert("RGB")
-    pil_image_data = pil_image.tobytes()
-
-    wx_image.SetData(pil_image_data)
-
-    return wx_image
-
 
 def pickle_load(file_id, lib_type):
     """load the pickled data of a specific anime/manga

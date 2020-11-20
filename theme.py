@@ -1,9 +1,9 @@
 # background1 = ()
 # background1_dark = ()
+import wx
 
-background2 = (128, 128, 128, 255)
-# Obtained from wx.SystemSettings.GetColour(19) on a Fedora system using a dark system theme
-background2_dark = (145, 145, 144, 255)
+background2 = wx.Colour(128, 128, 128)
+background2_dark = wx.Colour(145, 145, 144) # Light Grey
+background3_dark = wx.Colour(45, 45, 45) # Dark Grey
 
-# background3 = ()
-background3_dark = (45, 45, 45, 255)
+TEXT_COLOUR = wx.Colour(255,255,255) # White

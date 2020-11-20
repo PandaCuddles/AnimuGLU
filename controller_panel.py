@@ -81,20 +81,6 @@ class ControllerPanel(wx.Panel):
                 status_text=status,
             )
 
-    def next(self):
-
-        print(self.in_library)
-
-        if self.in_library:
-            print("In library tagged > Wahhhhh")
-        else:
-            self.library_type += 1
-            status = f"Save to: {library_type_l[self.library_type]} library"
-            pub.sendMessage(
-                "main_GUI-AnimuFrame",
-                status_text="Boooooooooo",
-            )
-
     def set_lib_type(self):
         """Load config value for last used library type"""
         with shelve.open("config.pkl") as db:
@@ -295,7 +281,7 @@ class ControllerPanel(wx.Panel):
         pub.sendMessage("display_synopsis", synopsis=self.selected_object.synopsis)
         pub.sendMessage("display_details", item_list=self.selected_object.info_list)
         pub.sendMessage("set_webpage", animu_url=self.selected_object.url)
-        wx_img = pickle_unpickle.convert_pil_img_to_wx_img(self.selected_object.image)
+        wx_img = pickle_unpickle.pil_to_wx(self.selected_object.image)
         pub.sendMessage("display_cover", wx_image=wx_img)
 
     # TODO: Cleanup/streamline sorting and formatting
@@ -406,6 +392,3 @@ class ControllerPanel(wx.Panel):
                 self.name_list[index] = f"{animu_obj.title[:28]}.. [{animu_obj.type}]"
             else:
                 self.name_list[index] = f"{animu_obj.title} [{animu_obj.type}]"
-
-    def next_library(self):
-        pass

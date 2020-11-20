@@ -11,18 +11,13 @@ class WebpagePanel(wx.Panel):
 
         self.parent = parent
 
-        if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(theme.background2_dark)
-        else:
-            self.SetBackgroundColour(theme.background2)
-
-        webpage_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
         self.webpage = None
 
+        self.SetBackgroundColour(theme.background2_dark)
+
+        webpage_sizer = wx.BoxSizer(wx.HORIZONTAL)
         mal_website = wx.Button(self, -1, "MyAnimeList")
         mal_website.Bind(wx.EVT_BUTTON, self.animu_webpage_button)
-
         webpage_sizer.Add(mal_website, 1, wx.CENTER | wx.EXPAND)
 
         self.SetSizer(webpage_sizer)

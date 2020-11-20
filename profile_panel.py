@@ -1,4 +1,3 @@
-import pickle_unpickle
 import sys
 import theme  # From theme.py
 import webpage_panel
@@ -69,10 +68,7 @@ class ProfileImage(wx.Panel):
 
         self.parent = parent
 
-        if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(theme.background2_dark)
-        else:
-            self.SetBackgroundColour(theme.background2)
+        self.SetBackgroundColour(theme.background2_dark)
 
         # Set profile image after GUI has been initally drawn
         wx.CallLater(0, self.on_resize)
@@ -108,9 +104,7 @@ class ProfileButtons(wx.Panel):
         self.parent = parent
 
         button_box = wx.BoxSizer(wx.HORIZONTAL)
-
         button = Buttons(self)
-
         button_box.Add(button, 1, wx.TOP | wx.EXPAND, 5)
 
         self.SetSizer(button_box)
@@ -128,27 +122,25 @@ class Buttons(wx.Panel):
         button_sizer = wx.BoxSizer(wx.VERTICAL)
 
         import_button = wx.Button(self, label="Import")
+        #import_button.Bind(wx.EVT_BUTTON, self.import_list)
+        button_sizer.Add(import_button, 1, wx.TOP | wx.EXPAND, 5)
 
         library_button = wx.Button(self, label="Library")
+        library_button.Bind(wx.EVT_BUTTON, self.library)
+        button_sizer.Add(library_button, 1, wx.TOP | wx.EXPAND, 5)
 
         delete_button = wx.Button(self, label="Delete")
+        delete_button.Bind(wx.EVT_BUTTON, self.delete_animu)
+        button_sizer.Add(delete_button, 1, wx.TOP | wx.EXPAND, 5)
 
         add_button = wx.Button(self, label="Add")
+        add_button.Bind(wx.EVT_BUTTON, self.add_animu)
+        button_sizer.Add(add_button, 1, wx.TOP | wx.EXPAND, 5)
 
         exit_button = wx.Button(self, label="Exit")
-
-        import_button.Bind(wx.EVT_BUTTON, self.import_list)
-        library_button.Bind(wx.EVT_BUTTON, self.library)
-        delete_button.Bind(wx.EVT_BUTTON, self.delete_animu)
-        add_button.Bind(wx.EVT_BUTTON, self.add_animu)
         exit_button.Bind(wx.EVT_BUTTON, self.exit)
-
-        button_sizer.Add(import_button, 1, wx.TOP | wx.EXPAND, 5)
-        button_sizer.Add(library_button, 1, wx.TOP | wx.EXPAND, 5)
-        button_sizer.Add(delete_button, 1, wx.TOP | wx.EXPAND, 5)
-        button_sizer.Add(add_button, 1, wx.TOP | wx.EXPAND, 5)
         button_sizer.Add(exit_button, 1, wx.TOP | wx.EXPAND, 5)
-
+        
         self.SetSizer(button_sizer)
 
     def import_list(self, event):

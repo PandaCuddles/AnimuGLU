@@ -23,6 +23,9 @@ class MainPanel(wx.Panel):
         else:
             self.SetBackgroundColour(wx.Colour("ORANGE"))
 
+        self.initUI()
+
+    def initUI(self):
         main_controller = controller_panel.ControllerPanel(self)
 
         main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -36,8 +39,8 @@ class MainPanel(wx.Panel):
         search_sizer = wx.BoxSizer(wx.HORIZONTAL)
         search_sizer.Add(search_panel.AnimuSearchPanel(self), 1, wx.EXPAND)
 
-        main_sizer.Add(search_sizer, 0, wx.ALL | wx.EXPAND, 10)
-        main_sizer.Add(animu_sizer, 9, wx.BOTTOM | wx.LEFT | wx.RIGHT | wx.EXPAND, 10)
+        main_sizer.Add(search_sizer, 1, wx.ALL | wx.EXPAND, 10)
+        main_sizer.Add(animu_sizer, 11, wx.BOTTOM | wx.LEFT | wx.RIGHT | wx.EXPAND, 10)
 
         self.SetSizer(main_sizer)
 
@@ -47,6 +50,7 @@ class AnimuFrame(wx.Frame):
 
     def __init__(self, *args, **kwargs):
         """Create the  Main Panel within the Main Frame"""
+        wx.Frame.__init__(self, *args, **kwargs)
 
         # Exit app if another app was started already
         self.name = f"AnimuGLU-{wx.GetUserId()}"
@@ -57,8 +61,16 @@ class AnimuFrame(wx.Frame):
             wx.MessageBox("App is already running", "ERROR")
             os._exit(0)
 
-        wx.Frame.__init__(self, *args, **kwargs)
+        self.initUI()
 
+        # Setup sort value if available
+        if os.path.isfile("config.pkl"):
+            pub.sendMessage("set_sort")
+
+        pub.subscribe(self.update_status_bar, "main_GUI-AnimuFrame")
+    
+    def initUI(self):
+        
         main_panel = MainPanel(self)
 
         # Status Bar for updates
@@ -84,12 +96,6 @@ class AnimuFrame(wx.Frame):
         icon = wx.Icon()
         icon.CopyFromBitmap(wx.Bitmap("icon.png", wx.BITMAP_TYPE_ANY))
         self.SetIcon(icon)
-
-        # Setup sort value if available
-        if os.path.isfile("config.pkl"):
-            pub.sendMessage("set_sort")
-
-        pub.subscribe(self.update_status_bar, "main_GUI-AnimuFrame")
 
     def update_status_bar(self, status_text):
         """Update status bar

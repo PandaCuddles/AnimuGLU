@@ -1,5 +1,3 @@
-# background1 = ()
-# background1_dark = ()
 import wx
 
 background2 = wx.Colour(128, 128, 128)

@@ -1,9 +1,12 @@
-import dlsv
 import jikan_controller
 import pickle_unpickle
+
+import json
 import shelve  # For saving and loading sort config
 import wx
 
+from io import BytesIO
+from os.path import isfile
 from os import remove
 from pubsub import pub
 
@@ -15,13 +18,14 @@ class ControllerPanel(wx.Panel):
 
     def __init__(self, parent, *args, **kwargs):
 
-        wx.Panel.__init__(self, parent, *args, **kwargs)
+        super().__init__(parent, *args, **kwargs)
 
         self.i_cant = "Uh, I can't, I'm buying clothes"
         self.alright = "Aight, well hurry up and come over here"
         self.cant_find_them = "I can't find them"
         self.what = "What do you mean you can't find them?"
         self.only = "I can't find them, there's only soup"
+
 
         self.animu_list_default = None  # keep original list for sorting purposes
         self.current_animu_list = None
@@ -41,6 +45,7 @@ class ControllerPanel(wx.Panel):
             "unfinished",
             "wishlist",
         ]  # Used for saving and loading library
+
         self.sort_status = (
             f"Library ({self.library_type_l[self.library_type]}): Unsorted"
         )
@@ -48,33 +53,37 @@ class ControllerPanel(wx.Panel):
         self.selected_object = None
         self.selected_index = None
 
+        self.lib_gen = self.lib_generator()
+
         pub.subscribe(self.show_search_results, "show_search_results")
-        pub.subscribe(self.show_library, "show_library")
-        pub.subscribe(self.delete_selected, "delete_selected")
-        pub.subscribe(self.save_selected, "save_selected")
-        pub.subscribe(self.view_selected, "view_selected")
-        pub.subscribe(self.import_list, "import_list")
-        pub.subscribe(self.sort_library, "sort_library")
-        pub.subscribe(self.set_sort, "set_sort")
-        pub.subscribe(self.save_sort, "save_sort")
-        pub.subscribe(self.save_lib_type, "save_lib_type")
-        pub.subscribe(self.set_lib_type, "set_lib_type")
-        pub.subscribe(self.lib_next, "next_library")
+        pub.subscribe(self.show_library,        "show_library")
+        pub.subscribe(self.delete_selected,     "delete_selected")
+        pub.subscribe(self.save_selected,       "save_selected")
+        pub.subscribe(self.view_selected,       "view_selected")
+        pub.subscribe(self.import_list,         "import_list")
+        pub.subscribe(self.sort_library,        "sort_library")
+        pub.subscribe(self.set_sort,            "set_sort")
+        pub.subscribe(self.save_sort,           "save_sort")
+        pub.subscribe(self.save_lib_type,       "save_lib_type")
+        pub.subscribe(self.set_lib_type,        "set_lib_type")
+        pub.subscribe(self.lib_next,            "next_library")
+
+    def lib_generator(self):
+        library = 0
+        while True:
+            if library == 3:
+                library = 0
+            yield library
+            library += 1
 
     def lib_next(self):
         """Go to next library type option and display for either saving or loading library"""
 
         if self.in_library:
-            if self.library_type < 2:
-                self.library_type += 1
-            else:
-                self.library_type = 0
+            self.library_type = next(self.lib_gen)
             pub.sendMessage("show_library")
         else:
-            if self.library_type < 2:
-                self.library_type += 1
-            else:
-                self.library_type = 0
+            self.library_type = next(self.lib_gen)
             status = f"Save to: {self.library_type_l[self.library_type]} library"
             pub.sendMessage(
                 "main_GUI-AnimuFrame",
@@ -142,7 +151,7 @@ class ControllerPanel(wx.Panel):
         for item in formatted_import_list:
             name = item[0]
             kind = item[1]
-            names, objs = jikan_controller.basic_search(kind, name)
+            _, objs = jikan_controller.basic_search(kind, name)
             if objs:
                 self.selected_object = objs[0]
                 self.save_selected()
@@ -229,15 +238,17 @@ class ControllerPanel(wx.Panel):
         genre_string = ", ".join(genres)
         save_obj.info_list.append(("Genre", genre_string))
         save_obj.synopsis = details["synopsis"]
+        save_obj.json = json.dumps(details)
 
     def save_selected(self):
+
         """Check if program is in search mode, and if so, save selected anime/manga"""
         if not self.in_library and self.selected_object:
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Saving...")
 
             # Retrieve more detailed info on selected item
             expanded_details = jikan_controller.detailed_search(
-                self.selected_object.mal_id, self.selected_object.searchType
+                self.selected_object.mal_id, self.selected_object.search_type
             )
             # Add extra details to animu object before pickling
             self.configure_save(self.selected_object, expanded_details)
@@ -277,12 +288,12 @@ class ControllerPanel(wx.Panel):
         """Take selected manga/anime and display its information"""
         self.selected_index = selected_index
         self.selected_object = self.current_animu_list[selected_index]
+        image = wx.Image(BytesIO(self.selected_object.image))
 
         pub.sendMessage("display_synopsis", synopsis=self.selected_object.synopsis)
         pub.sendMessage("display_details", item_list=self.selected_object.info_list)
         pub.sendMessage("set_webpage", animu_url=self.selected_object.url)
-        wx_img = pickle_unpickle.pil_to_wx(self.selected_object.image)
-        pub.sendMessage("display_cover", wx_image=wx_img)
+        pub.sendMessage("display_cover", wx_image=image)
 
     # TODO: Cleanup/streamline sorting and formatting
     def sort_library(self):

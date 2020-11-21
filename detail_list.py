@@ -6,7 +6,6 @@ from dateutil import parser
 from pubsub import pub
 
 
-
 class DetailsPanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         """Create the Details Panel"""

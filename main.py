@@ -1,8 +1,8 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3.8
 
 import animu_panel
 import controller_panel
-import dlsv
+import jikan_controller
 import list_panel
 import os
 import search_panel
@@ -14,19 +14,17 @@ from pubsub import pub
 class MainPanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         """Create the Search Panel"""
-        wx.Panel.__init__(self, parent, *args, **kwargs)
+        super().__init__(parent, *args, **kwargs)
 
         self.parent = parent
 
-        if wx.SystemSettings.GetAppearance().IsDark():
-            self.SetBackgroundColour(wx.Colour("DARK ORANGE"))
-        else:
-            self.SetBackgroundColour(wx.Colour("ORANGE"))
+        self.SetBackgroundColour(wx.Colour("DARK ORANGE"))
 
         self.initUI()
 
     def initUI(self):
-        main_controller = controller_panel.ControllerPanel(self)
+        # Initialize controller panel, creating the hub for pub/sub communications
+        controller_panel.ControllerPanel(self)
 
         main_sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -50,7 +48,7 @@ class AnimuFrame(wx.Frame):
 
     def __init__(self, *args, **kwargs):
         """Create the  Main Panel within the Main Frame"""
-        wx.Frame.__init__(self, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # Exit app if another app was started already
         self.name = f"AnimuGLU-{wx.GetUserId()}"
@@ -71,7 +69,7 @@ class AnimuFrame(wx.Frame):
     
     def initUI(self):
         
-        main_panel = MainPanel(self)
+        self.main_panel = MainPanel(self)
 
         # Status Bar for updates
         self.status_bar = self.CreateStatusBar(
@@ -109,10 +107,10 @@ class AnimuFrame(wx.Frame):
 if __name__ == "__main__":
 
     # Check for and create necessary folders if missing
-    dlsv.mk_dir("library")
-    dlsv.mk_dir("library/finished")
-    dlsv.mk_dir("library/unfinished")
-    dlsv.mk_dir("library/wishlist")
+    jikan_controller.mk_dir("library")
+    jikan_controller.mk_dir("library/finished")
+    jikan_controller.mk_dir("library/unfinished")
+    jikan_controller.mk_dir("library/wishlist")
 
     app = wx.App(False)
 

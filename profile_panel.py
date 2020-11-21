@@ -10,7 +10,7 @@ from wx.lib import statbmp
 class ProfilePanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         """Create the Profile Panel"""
-        wx.Panel.__init__(self, parent, *args, **kwargs)
+        super().__init__(parent, *args, **kwargs)
 
         self.parent = parent
 
@@ -30,7 +30,7 @@ class ProfilePanel(wx.Panel):
 class InnerProfilePanel(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         """Create the Inner Profile Panel"""
-        wx.Panel.__init__(self, parent, *args, **kwargs)
+        super().__init__(parent, *args, **kwargs)
 
         self.parent = parent
 
@@ -64,7 +64,7 @@ class InnerProfilePanel(wx.Panel):
 class ProfileImage(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         """Create Profile Image Panel"""
-        wx.Panel.__init__(self, parent, *args, **kwargs)
+        super().__init__(parent, *args, **kwargs)
 
         self.parent = parent
 
@@ -99,7 +99,7 @@ class ProfileImage(wx.Panel):
 class ProfileButtons(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         """Format panel for profile panel buttons"""
-        wx.Panel.__init__(self, parent, *args, **kwargs)
+        super().__init__(parent, *args, **kwargs)
 
         self.parent = parent
 
@@ -113,7 +113,7 @@ class ProfileButtons(wx.Panel):
 class Buttons(wx.Panel):
     def __init__(self, parent, *args, **kwargs):
         """Buttons panel for profile panel that contains main app buttons"""
-        wx.Panel.__init__(self, parent, *args, **kwargs)
+        super().__init__(parent, *args, **kwargs)
 
         self.parent = parent
 

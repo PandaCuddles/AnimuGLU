@@ -1,10 +1,16 @@
-import dlsv
 import os
+import requests
 
+from io import BytesIO
+from PIL import Image
+from os.path import isdir
+from os import mkdir
 
 from jikanpy import Jikan
 from dateutil import parser
 from pubsub import pub
+
+import json
 
 
 # Default local api url if using a local setup
@@ -44,8 +50,10 @@ class Manga:
         self.start_date = manga_dict["start_date"]
         self.end_date = manga_dict["end_date"]
         self.members = manga_dict["members"]
+        self.search_type = "Manga"
         self.image = None
-        self.searchType = "Manga"
+
+        self.json = manga_dict
 
         # Format the manga details before creating the information list
         self.format()
@@ -121,8 +129,10 @@ class Anime:
         self.end_date = anime_dict["end_date"]
         self.members = anime_dict["members"]
         self.rated = anime_dict["rated"]
+        self.search_type = "Anime"
         self.image = None
-        self.searchType = "Anime"
+
+        self.json = anime_dict
 
         # Format the anime details before creating the information list
         self.format()
@@ -225,10 +235,10 @@ def basic_search(animu_type, name, page_num=1):
         # Create object from anime/manga and download and store cover image inside the object
         if animu_type == "Anime":
             animu_obj = Anime(result)
-            animu_obj.image = dlsv.dl_img(animu_obj)
+            dl_img(animu_obj)
         if animu_type == "Manga":
             animu_obj = Manga(result)
-            animu_obj.image = dlsv.dl_img(animu_obj)
+            dl_img(animu_obj)
 
         animu_obj_list.append(animu_obj)
         animu_name_list.append(animu_obj.title)
@@ -236,3 +246,38 @@ def basic_search(animu_type, name, page_num=1):
     # Return list of animu objects and list of associated names
     pub.sendMessage("main_GUI-AnimuFrame", status_text="  Done")
     return animu_name_list, animu_obj_list
+
+
+def dl_img(animu_obj):
+    """Download anime/manga cover image, then store in anime/manga object
+
+    Args:
+        animu_obj (Anime/Manga object): Object containing information on a particular anime/manga, see jikan_controller.py
+
+    """
+
+    try:
+        #img = Image.open(requests.get(animu_obj.image_url, stream=True).raw)
+
+        response = requests.get(animu_obj.image_url)
+        #img = Image.open(BytesIO(response.content)) # Treats content like a file but purely in memory
+        #animu_obj.image = img
+        #animu_obj.image_data = response.content
+        if response.status_code == 200:
+            animu_obj.image = response.content
+
+    except requests.ConnectionError as e:
+        e_msg = f"Could not download {animu_obj.title}: {e}"
+        print(e_msg)
+        return
+
+
+def mk_dir(dir_name):
+    """Creates a directory if it doesn't exist"""
+    if not isdir(dir_name):
+        try:
+            mkdir(dir_name)
+        except OSError:
+            print(f"Failed create folder: {dir_name}")
+        else:
+            print(f"Created folder: {dir_name}")

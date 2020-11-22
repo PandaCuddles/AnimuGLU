@@ -2,6 +2,7 @@ import jikan_controller
 import load
 import sql_cmd
 from sql_cmd import set_config as update_config_database
+from jikan_controller import detailed_search
 
 import json
 import shelve  # For saving and loading sort config
@@ -20,6 +21,7 @@ class ControllerPanel(wx.Panel):
 
         super().__init__(parent, *args, **kwargs)
 
+        # Buying clothes at the soup store
         self.i_cant         = "Uh, I can't, I'm buying clothes"
         self.alright        = "Aight, well hurry up and come over here"
         self.cant_find_them = "I can't find them"
@@ -29,27 +31,26 @@ class ControllerPanel(wx.Panel):
         # Library stuff
         self.library_type = "finished"
         self.in_library   = False
+        self.lib_gen = self.lib_generator()
+        next(self.lib_gen) # Initialize generator
 
         # Config stuff
         self.conn = sql_cmd.setup("(startup) Database connection established")
         self.configs = sql_cmd.get_configs(self.conn)
         self.active = self.configs[self.library_type]
 
+        # Display stuff
         self.animu_list = []
         self.name_list = []
+        self.selected_object = None
+        self.selected_index = None
 
         # Sorting stuff
         self.disable_sort = False  # Disable sorting when in an empty library
         self.sort         = self.active[1]      # Used for current sorting type
-
         self.sort_status = f"Library ({self.library_type}): Unsorted"
 
-        self.selected_object = None
-        self.selected_index = None
-
-        self.lib_gen = self.lib_generator()
-        next(self.lib_gen) # Initialize generator
-
+        # Controller stuff
         pub.subscribe(self.show_search_results, "show_search_results")
         pub.subscribe(self.show_library,        "show_library")
         pub.subscribe(self.delete_selected,     "delete_selected")
@@ -70,12 +71,12 @@ class ControllerPanel(wx.Panel):
             index += 1
 
     def cleanup(self):
+        """Close database connection before exiting program"""
         self.conn.close()
         print("(shutdown) Database connection closed")
 
     def lib_next(self):
         """Go to next library type option and display for either saving or loading library"""
-
         if self.in_library:
             self.library_type = next(self.lib_gen)
             self.sort = self.configs[self.library_type][1]
@@ -104,29 +105,7 @@ class ControllerPanel(wx.Panel):
         pub.sendMessage( "main_GUI-AnimuFrame", status_text=f"Save to: {self.library_type} library",)
 
     def import_list(self, import_list):
-        formatted_import_list = []
-        for item in import_list:
-            if " -a" in item:
-                formatted_import_list.append((item[0:-3], "Anime"))
-            elif " -m" in item:
-                formatted_import_list.append((item[0:-3], "Manga"))
-            else:
-                with open("error.log", "a") as file:
-                    file.write(
-                        f"Line {import_list.index(item)}: {item} :FAILED (Formatting Error)\n"
-                    )
-
-        for item in formatted_import_list:
-            name = item[0]
-            kind = item[1]
-            _, objs = jikan_controller.basic_search(kind, name)
-            if objs:
-                self.selected_object = objs[0]
-                self.save_selected()
-        pub.sendMessage(
-            "main_GUI-AnimuFrame",
-            status_text="Finished Importing",
-        )
+        pass
 
     def show_library(self):
         """If library not empty, load and display library
@@ -153,13 +132,15 @@ class ControllerPanel(wx.Panel):
             self.name_list = name_list
             pub.sendMessage("populate_listbox", name_list=self.name_list)
 
-    def configure_and_save(self, save_obj, details, library):
+    def configure_and_save(self, save_obj, library):
         """Append formatted genre list and full synopsis to animu object and save
 
         Args:
-            save_obj (animu obj): An Anime or Manga object instance
-            details (dict): jikan api search result
+            save_obj (animu obj): Animu object instance
+            library  (string)   : Library type (finished, unfinished, wishlist)
         """
+        details = detailed_search(save_obj.mal_id, save_obj.search_type)
+
         if not details:
             return
 
@@ -176,19 +157,16 @@ class ControllerPanel(wx.Panel):
         sql_cmd.insert_data(self.conn, save_obj)
 
     def save_selected(self):
-
         """Check if program is in search mode, and if so, save selected anime/manga"""
         if not self.in_library and self.selected_object:
             exists = sql_cmd.check_exists(self.conn, self.selected_object.mal_id)
+
             if exists:
                 pub.sendMessage("main_GUI-AnimuFrame", status_text="Already saved to a library")
                 return # If saved already, don't try to save again
 
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Saving...")
-            mal_id = self.selected_object.mal_id
-            search_type = self.selected_object.search_type
-            expanded_details = jikan_controller.detailed_search(mal_id, search_type)
-            self.configure_and_save(self.selected_object, expanded_details, self.library_type)
+            self.configure_and_save(self.selected_object, self.library_type)
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Saved!")
 
         else:
@@ -221,6 +199,7 @@ class ControllerPanel(wx.Panel):
         pub.sendMessage("display_cover",    wx_image=image)
 
     def library_status(self, sort : int):
+        """Display current library type and sorting method"""
         sort_messages = [f"Library ({self.library_type}): Unsorted",
                          f"Library ({self.library_type}): Sorted by Name",
                          f"Library ({self.library_type}): Sorted by Type",
@@ -230,7 +209,6 @@ class ControllerPanel(wx.Panel):
     def sort_library(self):
         """Sort current library"""
         
-
         if self.in_library and not self.disable_sort:
             change_sort_type = self.sort.send # For readability
             change_sort_type(True) # Increment the sorting number for the current library

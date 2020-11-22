@@ -37,19 +37,6 @@ class Animu:
         self.start_date = info_dict["start_date"]
         self.end_date = info_dict["end_date"]
         self.members = info_dict["members"]
-        if loading:
-            self.image = info_dict["image"]
-            self.genre = info_dict["genre"]
-            self.json = info_dict["json"]
-            self.library = info_dict["library"]
-        else:
-            self.image = None
-            self.genre = None
-            self.json = None
-            self.library = None
-
-        if not loading:  
-            self.general_formatting()
 
         if type_is == "Anime":
             self.search_type = type_is
@@ -70,9 +57,17 @@ class Animu:
             self.manga_list()
 
         if loading:
+            self.image = info_dict["image"]
+            self.genre = info_dict["genre"]
+            self.json = info_dict["json"]
+            self.library = info_dict["library"]
             self.info_list.append(("Genre", self.genre))
-        
-        if not loading:
+        else:
+            self.image = None
+            self.genre = None
+            self.json = None
+            self.library = None
+            self.general_formatting()
             self.get_image()
 
     def anime_list(self):
@@ -168,7 +163,7 @@ class Animu:
             self.volumes = "Unknown"
 
 
-def detailed_search(mal_id, type_is):
+def detailed_search(mal_id : int, type_is : str) -> dict:
     """Search for specific MAL id
 
     Args:
@@ -190,7 +185,7 @@ def detailed_search(mal_id, type_is):
     return details
 
 
-def basic_search(animu_type, name, page_num=1):
+def basic_search(animu_type : str, name : str, page_num : int=1):
 
     animu_obj_list = []
     # name list corresponds to index of object list
@@ -228,15 +223,3 @@ def basic_search(animu_type, name, page_num=1):
     # Return list of animu objects and list of associated names
     pub.sendMessage("main_GUI-AnimuFrame", status_text="  Done")
     return animu_name_list, animu_obj_list
-
-def mk_dir(dir_name):
-    """Creates a directory if it doesn't exist"""
-    if not isdir(dir_name):
-        try:
-            mkdir(dir_name)
-        except OSError:
-            print(f"Failed create folder: {dir_name}")
-        else:
-            print(f"Created folder: {dir_name}")
-    else:
-        print(f"Directory {dir_name:<20}: EXISTS")

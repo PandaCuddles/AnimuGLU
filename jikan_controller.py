@@ -22,42 +22,74 @@ jikan_api_url = "https://api.jikan.moe/v3"
 jikan = Jikan(selected_base=jikan_api_url)
 
 
-# Base program directory
-prg_directory = os.getcwd()
+class Animu:
+    """Object representing either a single manga or a single anime"""
+    def __init__(self, info_dict : dict, type_is : str, loading: bool):
+        """Create Animu object from Jikan search results"""
+        self.mal_id = info_dict["mal_id"]
+        self.animu = info_dict["title"]
+        self.url = info_dict["url"]
+        self.image_url = info_dict["image_url"]
+        self.title = info_dict["title"]
+        self.synopsis = info_dict["synopsis"]
+        self.type = info_dict["type"]
+        self.score = info_dict["score"]
+        self.start_date = info_dict["start_date"]
+        self.end_date = info_dict["end_date"]
+        self.members = info_dict["members"]
+        if loading:
+            self.image = info_dict["image"]
+            self.genre = info_dict["genre"]
+            self.json = info_dict["json"]
+            self.library = info_dict["library"]
+        else:
+            self.image = None
+            self.genre = None
+            self.json = None
+            self.library = None
 
-""" Animu object
+        if not loading:  
+            self.general_formatting()
 
-A python object representing either a single manga or a single anime.
+        if type_is == "Anime":
+            self.search_type = type_is
+            self.episodes = info_dict["episodes"]
+            self.rated = info_dict["rated"]
+            self.airing = info_dict["airing"]
+            if not loading:
+                self.anime_formatting()
+            self.anime_list()
 
-"""
+        if type_is == "Manga":
+            self.search_type = type_is
+            self.publishing = info_dict["publishing"]
+            self.chapters = info_dict["chapters"]
+            self.volumes = info_dict["volumes"]
+            if not loading:
+                self.manga_formatting()
+            self.manga_list()
 
+        if loading:
+            self.info_list.append(("Genre", self.genre))
+        
+        if not loading:
+            self.get_image()
 
-class Manga:
-    def __init__(self, manga_dict):
-        """Create Manga object from Jikan search results, formatted from json->dict"""
-        self.manga = manga_dict["title"]
+    def anime_list(self):
+        self.info_list = [
+            ("Id", self.mal_id),
+            ("Title", self.title),
+            ("Airing", self.airing),
+            ("Type", self.type),
+            ("Episodes", self.episodes),
+            ("Score", self.score),
+            ("Start Date", self.start_date),
+            ("End Date", self.end_date),
+            ("Members", self.members),
+            ("Rated", self.rated),
+        ]
 
-        self.mal_id = manga_dict["mal_id"]
-        self.url = manga_dict["url"]
-        self.image_url = manga_dict["image_url"]
-        self.title = manga_dict["title"]
-        self.publishing = manga_dict["publishing"]
-        self.synopsis = manga_dict["synopsis"]
-        self.type = manga_dict["type"]
-        self.chapters = manga_dict["chapters"]
-        self.volumes = manga_dict["volumes"]
-        self.score = manga_dict["score"]
-        self.start_date = manga_dict["start_date"]
-        self.end_date = manga_dict["end_date"]
-        self.members = manga_dict["members"]
-        self.search_type = "Manga"
-        self.image = None
-
-        self.json = manga_dict
-
-        # Format the manga details before creating the information list
-        self.format()
-
+    def manga_list(self):
         self.info_list = [
             ("Id", self.mal_id),
             ("Title", self.title),
@@ -69,27 +101,20 @@ class Manga:
             ("Start Date", self.start_date),
             ("End Date", self.end_date),
             ("Members", self.members),
-        ] 
-    
-    def format(self):
-        # Publishing
-        if self.publishing:
-            self.publishing = "Publishing"
-        else:
-            self.publishing = "Finished"
-        
-        # Chapters
-        if self.chapters:
-            self.chapters = str(self.chapters)
-        else:
-            self.chapters = "Unknown"
-        
-        # Volumes
-        if self.volumes:
-            self.volumes = str(self.volumes)
-        else:
-            self.volumes = "Unknown"
-        
+        ]
+
+    def get_image(self):
+        try:
+            response = requests.get(self.image_url)
+            if response.status_code == 200:
+                self.image = response.content
+
+        except requests.ConnectionError as e:
+            e_msg = f"Could not download {self.title}: {e}"
+            print(e_msg)
+            
+
+    def general_formatting(self):
         # Score
         if self.score == 0:
             self.score = "None"
@@ -110,47 +135,7 @@ class Manga:
         else:
             self.end_date = "?"
 
-
-class Anime:
-    def __init__(self, anime_dict):
-        """Create Anime (animation) object from Jikan search results, formatted from json->dict"""
-        self.anime = anime_dict["title"]
-
-        self.mal_id = anime_dict["mal_id"]
-        self.url = anime_dict["url"]
-        self.image_url = anime_dict["image_url"]
-        self.title = anime_dict["title"]
-        self.airing = anime_dict["airing"]
-        self.synopsis = anime_dict["synopsis"]
-        self.type = anime_dict["type"]
-        self.episodes = anime_dict["episodes"]
-        self.score = anime_dict["score"]
-        self.start_date = anime_dict["start_date"]
-        self.end_date = anime_dict["end_date"]
-        self.members = anime_dict["members"]
-        self.rated = anime_dict["rated"]
-        self.search_type = "Anime"
-        self.image = None
-
-        self.json = anime_dict
-
-        # Format the anime details before creating the information list
-        self.format()
-
-        self.info_list = [
-            ("Id", self.mal_id),
-            ("Title", self.title),
-            ("Airing", self.airing),
-            ("Type", self.type),
-            ("Episodes", self.episodes),
-            ("Score", self.score),
-            ("Start Date", self.start_date),
-            ("End Date", self.end_date),
-            ("Members", self.members),
-            ("Rated", self.rated),
-        ]
-
-    def format(self):
+    def anime_formatting(self):
         # Airing
         if self.airing:
             self.airing = "True"
@@ -163,46 +148,43 @@ class Anime:
         else:
             self.episodes = "Unknown"
 
-        # Score
-        if self.score == 0:
-            self.score = "None"
+    def manga_formatting(self):
+        # Publishing
+        if self.publishing:
+            self.publishing = "Publishing"
         else:
-            self.score = str(self.score)
+            self.publishing = "Finished"
 
-        # Start Date
-        if self.start_date:
-            par = parser.parse(self.start_date)
-            self.start_date = f"{par.strftime('%b')} {par.day}, {par.year}"
+        # Chapters
+        if self.chapters:
+            self.chapters = str(self.chapters)
         else:
-            self.start_date = "?"
-
-        # End Date
-        if self.end_date:
-            par = parser.parse(self.end_date)
-            self.end_date = f"{par.strftime('%b')} {par.day}, {par.year}"
+            self.chapters = "Unknown"
+        
+        # Volumes
+        if self.volumes:
+            self.volumes = str(self.volumes)
         else:
-            self.end_date = "?"
+            self.volumes = "Unknown"
 
 
-def detailed_search(animu_id, istype):
+def detailed_search(mal_id, type_is):
     """Search for specific MAL id
 
     Args:
         animu_id (int): MAL id
-        istype (string): either 'Anime' or 'Manga', specifying Jikan search method
+        type_id (string): either 'Anime' or 'Manga', specifying Jikan search method
 
     Returns:
         dict: dictionary created from json formatted search results
     """
 
-    if istype == "Anime":
-        details = jikan.anime(animu_id)
-    elif istype == "Manga":
-        details = jikan.manga(animu_id)
+    if type_is == "Anime":
+        details = jikan.anime(mal_id)
+    elif type_is == "Manga":
+        details = jikan.manga(mal_id)
     else:
-        print(
-            "Error occurred with detailed search while saving: check jikan_controller.py"
-        )
+        print("Detail search: Error saving")
         return None
 
     return details
@@ -216,14 +198,16 @@ def basic_search(animu_type, name, page_num=1):
 
     # Loading message for user
     pub.sendMessage(
-        "main_GUI-AnimuFrame", status_text="  Loading... (may take a while)",
+        "main_GUI-AnimuFrame", status_text="  Loading... (may take a moment)",
     )
 
     # Search limit: 2 (Increase if on fast internet)
     try:
         results = jikan.search(
-            animu_type.lower(), name, page=page_num, parameters={"limit": 2}
-        )
+                               animu_type.lower(),
+                               name,
+                               page=page_num,
+                               parameters={"limit": 2})
     except Exception as e:
         print(e)
         pub.sendMessage("main_GUI-AnimuFrame", status_text="Search failed")
@@ -234,11 +218,9 @@ def basic_search(animu_type, name, page_num=1):
 
         # Create object from anime/manga and download and store cover image inside the object
         if animu_type == "Anime":
-            animu_obj = Anime(result)
-            dl_img(animu_obj)
+            animu_obj = Animu(result, "Anime", False)
         if animu_type == "Manga":
-            animu_obj = Manga(result)
-            dl_img(animu_obj)
+            animu_obj = Animu(result, "Manga", False)
 
         animu_obj_list.append(animu_obj)
         animu_name_list.append(animu_obj.title)
@@ -246,31 +228,6 @@ def basic_search(animu_type, name, page_num=1):
     # Return list of animu objects and list of associated names
     pub.sendMessage("main_GUI-AnimuFrame", status_text="  Done")
     return animu_name_list, animu_obj_list
-
-
-def dl_img(animu_obj):
-    """Download anime/manga cover image, then store in anime/manga object
-
-    Args:
-        animu_obj (Anime/Manga object): Object containing information on a particular anime/manga, see jikan_controller.py
-
-    """
-
-    try:
-        #img = Image.open(requests.get(animu_obj.image_url, stream=True).raw)
-
-        response = requests.get(animu_obj.image_url)
-        #img = Image.open(BytesIO(response.content)) # Treats content like a file but purely in memory
-        #animu_obj.image = img
-        #animu_obj.image_data = response.content
-        if response.status_code == 200:
-            animu_obj.image = response.content
-
-    except requests.ConnectionError as e:
-        e_msg = f"Could not download {animu_obj.title}: {e}"
-        print(e_msg)
-        return
-
 
 def mk_dir(dir_name):
     """Creates a directory if it doesn't exist"""
@@ -281,3 +238,5 @@ def mk_dir(dir_name):
             print(f"Failed create folder: {dir_name}")
         else:
             print(f"Created folder: {dir_name}")
+    else:
+        print(f"Directory {dir_name:<20}: EXISTS")

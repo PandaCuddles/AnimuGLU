@@ -1,5 +1,6 @@
 import theme
 import wx
+from wx.lib.wordwrap import wordwrap
 import wx.lib.agw.ultimatelistctrl as ULC
 
 from dateutil import parser
@@ -28,10 +29,20 @@ class DetailList(ULC.UltimateListCtrl):
     def __init__(self, parent, *args, **kwargs):
         """Create the Detail List Panel"""
         #wx.ListCtrl.__init__(self, parent, *args, **kwargs)
-        super().__init__(parent, wx.ID_ANY, agwStyle=ULC.ULC_REPORT | ULC.ULC_HAS_VARIABLE_ROW_HEIGHT | ULC.ULC_ALIGN_LEFT | ULC.ULC_NO_HIGHLIGHT | ULC.ULC_VRULES | ULC.ULC_HRULES)
+        super().__init__(parent, 
+                         wx.ID_ANY,
+                         agwStyle=ULC.ULC_REPORT | 
+                                  ULC.ULC_HAS_VARIABLE_ROW_HEIGHT | 
+                                  ULC.ULC_ALIGN_LEFT | 
+                                  ULC.ULC_NO_HIGHLIGHT | 
+                                  ULC.ULC_VRULES | 
+                                  ULC.ULC_HRULES)
+
         super().SetBackgroundColour(theme.background3_dark)
 
         self.parent = parent
+        
+        self.detail_width = 280
         
         self.initUI()
 
@@ -40,7 +51,7 @@ class DetailList(ULC.UltimateListCtrl):
     def initUI(self):
         self.SetBackgroundColour(theme.background3_dark)
         self.InsertColumn(0, "Details", format=ULC.ULC_FORMAT_LEFT, width=-1)
-        self.InsertColumn(1, "", format=ULC.ULC_FORMAT_LEFT, width=-1)
+        self.InsertColumn(1, "", format=ULC.ULC_FORMAT_LEFT, width=self.detail_width)
 
     def display_details(self, item_list : list):
         """Display anime/manga information, (e.g. name, rating, start/end date)
@@ -56,12 +67,16 @@ class DetailList(ULC.UltimateListCtrl):
 
             for item in item_list:
                 if not type(item[1]) == type(str):
-                    self.Append((item[0], str(item[1])))
+                    label = item[0]
+                    detail = wordwrap(str(item[1]), self.detail_width, wx.ClientDC(self))
+                    self.Append((label, detail))
                 else:
-                    self.Append(item)
+                    label = item[0]
+                    detail = wordwrap(item[1], self.detail_width, wx.ClientDC(self))
+                    self.Append((label, detail))
 
             # Resize columns to fit largest string in each column
             self.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-            self.SetColumnWidth(1, wx.LIST_AUTOSIZE)
+            #self.SetColumnWidth(1, wx.LIST_AUTOSIZE)
         else:
             self.DeleteAllItems()

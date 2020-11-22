@@ -2,7 +2,6 @@ import sys
 import theme  # From theme.py
 import webpage_panel
 import wx
-
 from pubsub import pub
 from wx.lib import statbmp
 
@@ -187,6 +186,5 @@ class Buttons(wx.Panel):
 
     def exit(self, event):
         """Exit application"""
-        pub.sendMessage("save_sort")
-        pub.sendMessage("save_lib_type")
+        pub.sendMessage("cleanup")
         sys.exit(0)

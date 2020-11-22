@@ -1,5 +1,7 @@
 import jikan_controller
-import pickle_unpickle
+import load
+import sql_cmd
+from sql_cmd import set_config as update_config_database
 
 import json
 import shelve  # For saving and loading sort config
@@ -10,9 +12,7 @@ from os.path import isfile
 from os import remove
 from pubsub import pub
 
-library_path = "library/"
 
-# TODO: Redo Controller Panel docstring
 class ControllerPanel(wx.Panel):
     """Controller Panel containing key program logic, and acts as a 'main hub' for different parts of the program"""
 
@@ -20,40 +20,35 @@ class ControllerPanel(wx.Panel):
 
         super().__init__(parent, *args, **kwargs)
 
-        self.i_cant = "Uh, I can't, I'm buying clothes"
-        self.alright = "Aight, well hurry up and come over here"
+        self.i_cant         = "Uh, I can't, I'm buying clothes"
+        self.alright        = "Aight, well hurry up and come over here"
         self.cant_find_them = "I can't find them"
-        self.what = "What do you mean you can't find them?"
-        self.only = "I can't find them, there's only soup"
-
-
-        self.animu_list_default = None  # keep original list for sorting purposes
-        self.current_animu_list = None
-
-        self.name_list_default = None  # keep original list for sorting purposes
-        self.name_list = None
+        self.what           = "What do you mean you can't find them?"
+        self.only           = "I can't find them, there's only soup"
 
         # Library stuff
-        self.library_type = 0
-        self.in_library = False
+        self.library_type = "finished"
+        self.in_library   = False
+
+        # Config stuff
+        self.conn = sql_cmd.setup("(startup) Database connection established")
+        self.configs = sql_cmd.get_configs(self.conn)
+        self.active = self.configs[self.library_type]
+
+        self.animu_list = []
+        self.name_list = []
 
         # Sorting stuff
         self.disable_sort = False  # Disable sorting when in an empty library
-        self.sort = 1  # Used for current sorting type
-        self.library_type_l = [
-            "finished",
-            "unfinished",
-            "wishlist",
-        ]  # Used for saving and loading library
+        self.sort         = self.active[1]      # Used for current sorting type
 
-        self.sort_status = (
-            f"Library ({self.library_type_l[self.library_type]}): Unsorted"
-        )
+        self.sort_status = f"Library ({self.library_type}): Unsorted"
 
         self.selected_object = None
         self.selected_index = None
 
         self.lib_gen = self.lib_generator()
+        next(self.lib_gen) # Initialize generator
 
         pub.subscribe(self.show_search_results, "show_search_results")
         pub.subscribe(self.show_library,        "show_library")
@@ -62,53 +57,35 @@ class ControllerPanel(wx.Panel):
         pub.subscribe(self.view_selected,       "view_selected")
         pub.subscribe(self.import_list,         "import_list")
         pub.subscribe(self.sort_library,        "sort_library")
-        pub.subscribe(self.set_sort,            "set_sort")
-        pub.subscribe(self.save_sort,           "save_sort")
-        pub.subscribe(self.save_lib_type,       "save_lib_type")
-        pub.subscribe(self.set_lib_type,        "set_lib_type")
         pub.subscribe(self.lib_next,            "next_library")
+        pub.subscribe(self.cleanup,             "cleanup")
 
     def lib_generator(self):
-        library = 0
+        index = 0
+        library = ["finished", "unfinished", "wishlist"]
         while True:
-            if library == 3:
-                library = 0
-            yield library
-            library += 1
+            if index == 3:
+                index = 0
+            yield library[index]
+            index += 1
+
+    def cleanup(self):
+        self.conn.close()
+        print("(shutdown) Database connection closed")
 
     def lib_next(self):
         """Go to next library type option and display for either saving or loading library"""
 
         if self.in_library:
             self.library_type = next(self.lib_gen)
+            self.sort = self.configs[self.library_type][1]
+            self.library_status(next(self.sort))
             pub.sendMessage("show_library")
         else:
             self.library_type = next(self.lib_gen)
-            status = f"Save to: {self.library_type_l[self.library_type]} library"
-            pub.sendMessage(
-                "main_GUI-AnimuFrame",
-                status_text=status,
-            )
-
-    def set_lib_type(self):
-        """Load config value for last used library type"""
-        with shelve.open("config.pkl") as db:
-            self.library_type = db["library_type"]
-
-    def save_lib_type(self):
-        """Save config value for last used library type"""
-        with shelve.open("config.pkl") as db:
-            db["library_type"] = self.library_type
-
-    def set_sort(self):
-        """Load config value for last used sorting type"""
-        with shelve.open("config.pkl") as db:
-            self.sort = db["sort_type"]
-
-    def save_sort(self):
-        """Save config value for last used sorting type"""
-        with shelve.open("config.pkl") as db:
-            db["sort_type"] = self.sort
+            self.sort = self.configs[self.library_type][1]
+            status = f"Save to: {self.library_type} library"
+            pub.sendMessage("main_GUI-AnimuFrame", status_text=status)
 
     def show_search_results(self, names, animu_objects):
         """Send results to listbox and download cover images
@@ -120,20 +97,11 @@ class ControllerPanel(wx.Panel):
 
         """
         self.in_library = False
-        self.current_animu_list = animu_objects
+        self.animu_list = animu_objects
+        self.name_list = names
 
-        # Reset sorting library variables
-        self.animu_list_default = None
-        self.name_list_default = None
-        self.name_list = None
-
-        pub.sendMessage("populate_listbox", name_list=names)
-
-        # Send message for current library to save anime/manga to
-        pub.sendMessage(
-            "main_GUI-AnimuFrame",
-            status_text=f"Save to: {self.library_type_l[self.library_type]} library",
-        )
+        pub.sendMessage("populate_listbox", name_list=self.name_list)
+        pub.sendMessage( "main_GUI-AnimuFrame", status_text=f"Save to: {self.library_type} library",)
 
     def import_list(self, import_list):
         formatted_import_list = []
@@ -167,62 +135,26 @@ class ControllerPanel(wx.Panel):
         and display message that library is empty
 
         """
+        name_list, library = load.load_library(self.conn, self.library_type, next(self.sort))
 
-        name_list, library_objects = pickle_unpickle.load_library(
-            self.library_type_l[self.library_type]
-        )
-
-        if name_list == None or library_objects == None:
+        if name_list == None or library == None:
             # Clears the listbox by sending empty list
-            pub.sendMessage("populate_listbox", name_list=name_list)
-            pub.sendMessage(
-                "main_GUI-AnimuFrame",
-                status_text=f"Nothing in library ({self.library_type_l[self.library_type]}) yet",
-            )
+            pub.sendMessage("populate_listbox", name_list=None)
+            pub.sendMessage("main_GUI-AnimuFrame", status_text=f"Nothing in library ({self.library_type}) yet",)
             self.disable_sort = True
-
             return None
+
         else:
             self.disable_sort = False
-            # If you are in the library and click the library button again, just load previous results
-            if self.in_library:
-                self.current_animu_list = library_objects
-                self.name_list = name_list
-
-                # Save second copy of library objects for sorting purposes
-                self.animu_list_default = library_objects
-                self.name_list_default = name_list
-                pub.sendMessage("populate_listbox", name_list=self.name_list)
-
-                if self.sort != 0:
-                    self.sort -= 1
-                elif self.sort == 0:
-                    self.sort = 3
-
-                self.sort_library()
-            else:
-                # In library, so set value to reflect that
+            if not self.in_library:
                 self.in_library = True
+                self.library_status(next(self.sort))
+            self.animu_list = library
+            self.name_list = name_list
+            pub.sendMessage("populate_listbox", name_list=self.name_list)
 
-                self.current_animu_list = library_objects
-                self.name_list = name_list
-
-                # Save second copy of library objects for sorting purposes
-                self.animu_list_default = library_objects
-                self.name_list_default = name_list
-
-                # Sort functions increment sort counter by 1 each time,
-                # so loading library with saved sort value needs to decrement
-                # by 1 before sorting library
-                if self.sort != 0:
-                    self.sort -= 1
-                elif self.sort == 0:
-                    self.sort = 3
-
-                self.sort_library()
-
-    def configure_save(self, save_obj, details):
-        """Append formatted genre list and full synopsis to animu object
+    def configure_and_save(self, save_obj, details, library):
+        """Append formatted genre list and full synopsis to animu object and save
 
         Args:
             save_obj (animu obj): An Anime or Manga object instance
@@ -234,172 +166,95 @@ class ControllerPanel(wx.Panel):
         genres = []
         for genre in details["genres"]:
             genres.append(genre["name"])
-
         genre_string = ", ".join(genres)
-        save_obj.info_list.append(("Genre", genre_string))
+
         save_obj.synopsis = details["synopsis"]
-        save_obj.json = json.dumps(details)
+        save_obj.genre    = genre_string
+        save_obj.json     = json.dumps(details)
+        save_obj.library  = library
+
+        sql_cmd.insert_data(self.conn, save_obj)
 
     def save_selected(self):
 
         """Check if program is in search mode, and if so, save selected anime/manga"""
         if not self.in_library and self.selected_object:
+            exists = sql_cmd.check_exists(self.conn, self.selected_object.mal_id)
+            if exists:
+                pub.sendMessage("main_GUI-AnimuFrame", status_text="Already saved to a library")
+                return # If saved already, don't try to save again
+
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Saving...")
-
-            # Retrieve more detailed info on selected item
-            expanded_details = jikan_controller.detailed_search(
-                self.selected_object.mal_id, self.selected_object.search_type
-            )
-            # Add extra details to animu object before pickling
-            self.configure_save(self.selected_object, expanded_details)
-
-            pickle_unpickle.pickle_save(
-                self.selected_object, self.library_type_l[self.library_type]
-            )
-
+            mal_id = self.selected_object.mal_id
+            search_type = self.selected_object.search_type
+            expanded_details = jikan_controller.detailed_search(mal_id, search_type)
+            self.configure_and_save(self.selected_object, expanded_details, self.library_type)
             pub.sendMessage("main_GUI-AnimuFrame", status_text="Saved!")
+
         else:
-            pub.sendMessage(
-                "main_GUI-AnimuFrame", status_text="No search item selected"
-            )
+            pub.sendMessage("main_GUI-AnimuFrame", status_text="No search item selected")
 
     def delete_selected(self):
         """Delete selection, reload library, clear information section of app"""
         if self.in_library and not (self.selected_index == None):
+            mal_id = self.animu_list[self.selected_index].mal_id
+            sql_cmd.delete(self.conn, mal_id)
 
-            animu = self.current_animu_list[self.selected_index]
-
-            remove(
-                f"{library_path}{self.library_type_l[self.library_type]}/{str(animu.mal_id)}.pkl"
-            )
-            pub.sendMessage("show_library")
             pub.sendMessage("display_synopsis", synopsis=None)
-            pub.sendMessage("display_details", item_list=None)
-            pub.sendMessage("set_webpage", animu_url=None)
-            pub.sendMessage("display_cover", wx_image=None)
+            pub.sendMessage("display_details",  item_list=None)
+            pub.sendMessage("set_webpage",      animu_url=None)
+            pub.sendMessage("display_cover",    wx_image=None)
+            pub.sendMessage("show_library")
 
         else:
-            pub.sendMessage(
-                "main_GUI-AnimuFrame",
-                status_text="No library item selected",
-            )
+            pub.sendMessage("main_GUI-AnimuFrame", status_text="No library item selected",)
 
     def view_selected(self, selected_index):
         """Take selected manga/anime and display its information"""
         self.selected_index = selected_index
-        self.selected_object = self.current_animu_list[selected_index]
+        self.selected_object = self.animu_list[selected_index]
         image = wx.Image(BytesIO(self.selected_object.image))
 
         pub.sendMessage("display_synopsis", synopsis=self.selected_object.synopsis)
-        pub.sendMessage("display_details", item_list=self.selected_object.info_list)
-        pub.sendMessage("set_webpage", animu_url=self.selected_object.url)
-        pub.sendMessage("display_cover", wx_image=image)
+        pub.sendMessage("display_details",  item_list=self.selected_object.info_list)
+        pub.sendMessage("set_webpage",      animu_url=self.selected_object.url)
+        pub.sendMessage("display_cover",    wx_image=image)
 
-    # TODO: Cleanup/streamline sorting and formatting
+    def library_status(self, sort : int):
+        sort_messages = [f"Library ({self.library_type}): Unsorted",
+                         f"Library ({self.library_type}): Sorted by Name",
+                         f"Library ({self.library_type}): Sorted by Type",
+                         f"Library ({self.library_type}): Sorted by Name and Type"]
+        pub.sendMessage("main_GUI-AnimuFrame", status_text=sort_messages[sort])
+
     def sort_library(self):
-        """Sort current library
-        Zip current library up (contains tuples of (name, object))
-        Sort by name (using the name inside each tuple) and/or
-        sort by type (using the type attribute inside each object)
-        Unzip sorted library
-        Display sorted library
-        """
+        """Sort current library"""
+        
 
-        if self.in_library and not (self.disable_sort):
-            if self.sort == 0:
-                self.current_animu_list = self.animu_list_default
-                self.name_list = self.name_list_default
-                pub.sendMessage("populate_listbox", name_list=self.name_list)
-                pub.sendMessage(
-                    "main_GUI-AnimuFrame",
-                    status_text=f"Library ({self.library_type_l[self.library_type]}): Unsorted",
-                )
-                self.sort += 1
-                self.sort_status = (
-                    f"Library ({self.library_type_l[self.library_type]}): Unsorted"
-                )
-            elif self.sort == 1:
-                self.current_animu_list = self.animu_list_default
-                self.name_list = self.name_list_default
+        if self.in_library and not self.disable_sort:
+            change_sort_type = self.sort.send # For readability
+            change_sort_type(True) # Increment the sorting number for the current library
+            sort_type = next(self.sort)
 
-                unsorted = zip(self.name_list_default, self.animu_list_default)
-                name_sorted = sorted(unsorted, key=lambda k: k[0])
-                self.name_list, self.current_animu_list = zip(*name_sorted)
-                pub.sendMessage("populate_listbox", name_list=self.name_list)
-                pub.sendMessage(
-                    "main_GUI-AnimuFrame",
-                    status_text=f"Library ({self.library_type_l[self.library_type]}): Sorted by Name",
-                )
-                self.sort += 1
-                self.sort_status = f"Library ({self.library_type_l[self.library_type]}): Sorted by Name"
+            if sort_type == 0:
+                pub.sendMessage("show_library")
+                self.library_status(sort_type)
 
-            elif self.sort == 2:
-                # Reset lists from name sorting and format for type sorting
-                self.current_animu_list = self.animu_list_default
-                self.name_list = self.name_list_default
+            elif sort_type == 1:
+                pub.sendMessage("show_library")
+                self.library_status(sort_type)
 
-                # Format names, then sort by type
-                self.format_type_sort()
-
-                unsorted = zip(self.name_list, self.current_animu_list)
-                type_sorted = sorted(unsorted, key=lambda k: k[1].type)
-                self.name_list, self.current_animu_list = zip(*type_sorted)
-                pub.sendMessage("populate_listbox", name_list=self.name_list)
-                pub.sendMessage(
-                    "main_GUI-AnimuFrame",
-                    status_text=f"Library ({self.library_type_l[self.library_type]}): Sorted by Type",
-                )
-                self.sort += 1
-                self.sort_status = f"Library ({self.library_type_l[self.library_type]}): Sorted by Type"
-
-            elif self.sort == 3:
-                unsorted = zip(self.name_list_default, self.animu_list_default)
-                name_sorted = sorted(unsorted, key=lambda k: k[0])
-
-                # Unzip, format names, rezip and sort by type
-                self.name_list, self.current_animu_list = zip(*name_sorted)
-                self.format_type_sort()
-
-                name_formatted = zip(self.name_list, self.current_animu_list)
-                type_sorted = sorted(name_formatted, key=lambda k: k[1].type)
-                self.name_list, self.current_animu_list = zip(*type_sorted)
-                pub.sendMessage("populate_listbox", name_list=self.name_list)
-                pub.sendMessage(
-                    "main_GUI-AnimuFrame",
-                    status_text=f"Library ({self.library_type_l[self.library_type]}): Sorted by Name and Type",
-                )
-                self.sort_status = f"Library ({self.library_type_l[self.library_type]}): Sorted by Name and Type"
-                self.sort = 0
+            elif sort_type == 2:
+                pub.sendMessage("show_library")
+                self.library_status(sort_type)
+                
+            elif sort_type == 3:
+                pub.sendMessage("show_library")
+                self.library_status(sort_type)
 
             else:
                 print("Error with sort function in controller_panel")
+
+            update_config_database(self.conn, self.configs[self.library_type], sort=True)
         else:
-            pub.sendMessage(
-                "main_GUI-AnimuFrame",
-                status_text="Cannot sort unless in library",
-            )
-
-    def format_type_sort(self):
-        new_names = []
-
-        for name in self.name_list:
-            index = self.name_list.index(name)  # Get index of current anime/manga
-            animu_obj = self.current_animu_list[index]  # Get anime/manga object
-
-            # Format names for displaying type sorted library
-            if len(animu_obj.title) > 28:
-                new_names.append(f"[{animu_obj.type}] {animu_obj.title[:28]}..")
-            else:
-                new_names.append(f"[{animu_obj.type}] {animu_obj.title} ")
-        self.name_list = new_names
-
-    def format_name_sort(self):
-        for name in self.name_list:
-            index = self.name_list.index(name)  # Get index of current anime/manga
-            animu_obj = self.current_animu_list[index]  # Get anime/manga object
-
-            # Format names for displaying name sorted library
-            if len(animu_obj.title) > 28:
-                self.name_list[index] = f"{animu_obj.title[:28]}.. [{animu_obj.type}]"
-            else:
-                self.name_list[index] = f"{animu_obj.title} [{animu_obj.type}]"
+            pub.sendMessage("main_GUI-AnimuFrame", status_text="Cannot sort unless in library")

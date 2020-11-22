@@ -4,8 +4,10 @@ import animu_panel
 import controller_panel
 import jikan_controller
 import list_panel
-import os
 import search_panel
+import sql_cmd
+
+import os
 import wx
 
 from pubsub import pub
@@ -61,10 +63,6 @@ class AnimuFrame(wx.Frame):
 
         self.initUI()
 
-        # Setup sort value if available
-        if os.path.isfile("config.pkl"):
-            pub.sendMessage("set_sort")
-
         pub.subscribe(self.update_status_bar, "main_GUI-AnimuFrame")
     
     def initUI(self):
@@ -72,9 +70,7 @@ class AnimuFrame(wx.Frame):
         self.main_panel = MainPanel(self)
 
         # Status Bar for updates
-        self.status_bar = self.CreateStatusBar(
-            style=wx.STB_DEFAULT_STYLE ^ wx.STB_SIZEGRIP,
-        )
+        self.status_bar = self.CreateStatusBar(style=wx.STB_DEFAULT_STYLE ^ wx.STB_SIZEGRIP)
 
         # Set initial status bar text
         self.status_bar.SetStatusText("Welcome to AnimuGLU!")
@@ -82,14 +78,10 @@ class AnimuFrame(wx.Frame):
 
         if wx.SystemSettings.GetAppearance().IsDark():
             self.status_bar.SetBackgroundColour(wx.Colour("DARK ORANGE"))
-            self.status_bar.SetForegroundColour(
-                wx.Colour("BLACK")
-            )  # Sets text color to black
+            self.status_bar.SetForegroundColour(wx.Colour("BLACK")) # Sets text color to black
         else:
             self.status_bar.SetBackgroundColour(wx.Colour("ORANGE"))
-            self.status_bar.SetForegroundColour(
-                wx.Colour("WHITE")
-            )  # Sets text color to white
+            self.status_bar.SetForegroundColour(wx.Colour("WHITE")) # Sets text color to white
 
         icon = wx.Icon()
         icon.CopyFromBitmap(wx.Bitmap("icon.png", wx.BITMAP_TYPE_ANY))
@@ -106,11 +98,13 @@ class AnimuFrame(wx.Frame):
 
 if __name__ == "__main__":
 
-    # Check for and create necessary folders if missing
-    jikan_controller.mk_dir("library")
-    jikan_controller.mk_dir("library/finished")
-    jikan_controller.mk_dir("library/unfinished")
-    jikan_controller.mk_dir("library/wishlist")
+    if not os.path.isfile("animu.db"):
+        conn = sql_cmd.setup()
+        sql_cmd.create_data_table(conn)
+        sql_cmd.create_config_table(conn)
+        sql_cmd.default_config(conn)
+        conn.close()
+        print("(setup) Database connection closed")
 
     app = wx.App(False)
 
